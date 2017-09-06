@@ -59,7 +59,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy "Debug.Mod.dll" "F:\Games\Steam\steamapps\common\Starship Theory\Mods\Debug.Mod.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

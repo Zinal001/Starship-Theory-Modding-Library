@@ -30,6 +30,14 @@ namespace Debug.Mod
             //The manager gameobject contains most, if not all, components in the scene.
             _Manager = GameObject.Find("Manager");
 
+            
+        }
+
+        /// <summary>
+        /// FirstGUIPass is called whenever the gui of the mod window (or custom gui) should be created.
+        /// </summary>
+        public override void FirstGUIPass()
+        {
             //Create a new GUI button
             _ToggleBtn = new StarshipTheory.ModLib.GUI.Button("Toggle Debug Mode");
 

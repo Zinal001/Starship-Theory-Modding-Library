@@ -39,13 +39,23 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
+            if (this.Visible)
             {
                 Direction dir = LayoutDirection;
-                if(dir == Direction.Horizontal)
-                    UnityEngine.GUILayout.BeginHorizontal(this.Options);
+                if(Style != null)
+                {
+                    if (dir == Direction.Horizontal)
+                        UnityEngine.GUILayout.BeginHorizontal(Style, this.Options);
+                    else
+                        UnityEngine.GUILayout.BeginVertical(Style, this.Options);
+                }
                 else
-                    UnityEngine.GUILayout.BeginVertical(this.Options);
+                {
+                    if (dir == Direction.Horizontal)
+                        UnityEngine.GUILayout.BeginHorizontal(this.Options);
+                    else
+                        UnityEngine.GUILayout.BeginVertical(this.Options);
+                }
 
                 foreach(GUIItem item in Items)
                 {

@@ -68,9 +68,12 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
+            if (this.Style == null)
+                this.Style = UnityEngine.GUI.skin.scrollView;
+
+            if (this.Visible)
             {
-                UnityEngine.Vector2 pos = UnityEngine.GUILayout.BeginScrollView(ScrollPosition, AlwaysShowHorizontal, AlwaysShowVertical, Options);
+                UnityEngine.Vector2 pos = UnityEngine.GUILayout.BeginScrollView(ScrollPosition, AlwaysShowHorizontal, AlwaysShowVertical, UnityEngine.GUI.skin.horizontalScrollbar, UnityEngine.GUI.skin.verticalScrollbar, Style, Options);
                 if (pos != ScrollPosition)
                     ScrollChanged?.Invoke(this);
                 ScrollPosition = pos;

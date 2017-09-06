@@ -41,9 +41,12 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
+            if (this.Style == null)
+                this.Style = UnityEngine.GUI.skin.button;
+
             if (this.Visible)
             {
-                if (UnityEngine.GUILayout.RepeatButton(new UnityEngine.GUIContent(Text, Image, Tooltip), Options))
+                if (UnityEngine.GUILayout.RepeatButton(new UnityEngine.GUIContent(Text, Image, Tooltip), Style, Options))
                     Clicked?.Invoke(this);
             }
         }

@@ -35,6 +35,8 @@ namespace StarshipTheory.ModLib
         /// </summary>
         public GUI.Window ModWindow { get; internal set; }
 
+        internal bool _FirstGuiPassCalled = false;
+
 
         public AbstractMod()
         {
@@ -63,6 +65,12 @@ namespace StarshipTheory.ModLib
         /// </summary>
         /// <param name="saveSlot"></param>
         public virtual void OnGameSave(int saveSlot) { }
+
+        /// <summary>
+        /// <para>This method is called by the modloader at the first gui pass.</para>
+        /// <para>Use this method to create your desired mod window components.</para>
+        /// </summary>
+        public virtual void FirstGUIPass() { }
 
         /// <summary>
         /// This method is called by the modloader whenever custom gui should be drawn.

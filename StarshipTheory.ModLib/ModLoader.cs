@@ -68,7 +68,7 @@ namespace StarshipTheory.ModLib
                         AbstractMod M = (AbstractMod)Activator.CreateInstance(T);
                         if (M != null)
                         {
-                            M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.ModName) { Visible = false, IsDraggable = true };
+                            M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.ModName) { Visible = false, IsDraggable = true, IsResizeable = true };
 
                             M.ModFolder = DllFile.Directory.FullName;
                             M.Enabled = true;
@@ -93,8 +93,17 @@ namespace StarshipTheory.ModLib
 
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
             {
-                M.OnInitialize();
-                UnityEngine.Debug.Log("Initialized " + M.ModName + " - " + M.ModVersion.ToString());
+                try
+                {
+
+                    M.OnInitialize();
+                    UnityEngine.Debug.Log("Initialized " + M.ModName + " - " + M.ModVersion.ToString());
+                }
+                catch(Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    UnityEngine.Debug.LogError(ex);
+                }
             }
 
         }
@@ -106,7 +115,17 @@ namespace StarshipTheory.ModLib
         public void __OnGameStarted()
         {
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-                M.OnGameStarted();
+            {
+                try
+                {
+                    M.OnGameStarted();
+                }
+                catch(Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    UnityEngine.Debug.LogError(ex);
+                }
+            }
         }
 
         /// <summary>
@@ -116,7 +135,17 @@ namespace StarshipTheory.ModLib
         public void __OnGameLoaded(int saveSlot)
         {
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-                M.OnGameLoad(saveSlot);
+            {
+                try
+                {
+                    M.OnGameLoad(saveSlot);
+                }
+                catch (Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    UnityEngine.Debug.LogError(ex);
+                }
+            }
         }
 
         /// <summary>
@@ -126,8 +155,20 @@ namespace StarshipTheory.ModLib
         public void __OnGameSaved(int saveSlot)
         {
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-                M.OnGameSave(saveSlot);
+            {
+                try
+                {
+                    M.OnGameSave(saveSlot);
+                }
+                catch (Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    UnityEngine.Debug.LogError(ex);
+                }
+            }
         }
+
+        private bool _ModAreaResized = false;
 
         /// <summary>
         /// <para>Called from within the game's code. Notifying all enabled mods that it can draw custom gui elements</para>
@@ -136,14 +177,48 @@ namespace StarshipTheory.ModLib
         public void __OnGui()
         {
             if(ManagerMenu.mainMenuActive)
+            {
+                if(!_ModAreaResized)
+                {
+                    _ModListButtonArea.Options = new UnityEngine.GUILayoutOption[] { UnityEngine.GUILayout.MaxWidth(400), UnityEngine.GUILayout.MinWidth(200) };
+                    _ModAreaResized = true;
+                }
+
                 _ModListButtonArea.Draw();
+            }
 
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
             {
-                if(ManagerMenu.mainMenuActive)
-                    M.ModWindow.Draw();
+                try
+                {
+                    if (!M._FirstGuiPassCalled)
+                    {
+                        if(M.ModWindow.IsResizeable)
+                        {
+                            M.ModWindow.Options = new UnityEngine.GUILayoutOption[]
+                            {
+                                UnityEngine.GUILayout.MinWidth(200),
+                                UnityEngine.GUILayout.MinHeight(20),
+                                UnityEngine.GUILayout.MaxWidth(UnityEngine.Screen.width),
+                                UnityEngine.GUILayout.MaxHeight(UnityEngine.Screen.height)
+                            };
 
-                M.OnGUI();
+                        }
+                            
+                        M.FirstGUIPass();
+                        M._FirstGuiPassCalled = true;
+                    }
+
+                    if (ManagerMenu.mainMenuActive)
+                        M.ModWindow.Draw();
+
+                    M.OnGUI();
+                }
+                catch(Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    UnityEngine.Debug.LogError(ex);
+                }
             }
         }
 
@@ -160,8 +235,16 @@ namespace StarshipTheory.ModLib
             UnityEngine.Debug.Log("Showing Mods: " + (_ShowModList ? "True" : "False"));
             if(_ShowModList)
             {
-                foreach (GUI.GUIItem modbtn in _ModListButtonArea.Items)
+                float MaxWidth = 0;
+                foreach (GUI.Button modbtn in _ModListButtonArea.Items)
+                {
                     modbtn.Visible = true;
+                    UnityEngine.Vector2 size = modbtn.Style.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
+                    if (size.x > MaxWidth)
+                        MaxWidth = size.x;
+                }
+
+                _ModListButtonArea.Size = new UnityEngine.Rect(UnityEngine.Screen.width - MaxWidth, 0, MaxWidth, UnityEngine.Screen.height);
             }
             else
             {

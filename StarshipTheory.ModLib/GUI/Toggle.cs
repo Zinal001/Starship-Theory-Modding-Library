@@ -60,9 +60,12 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
+            if (this.Style == null)
+                this.Style = UnityEngine.GUI.skin.button;
+
+            if (this.Visible)
             {
-                bool c = UnityEngine.GUILayout.Toggle(IsChecked, new UnityEngine.GUIContent(Text, Image, Tooltip), Options);
+                bool c = UnityEngine.GUILayout.Toggle(IsChecked, new UnityEngine.GUIContent(Text, Image, Tooltip), Style, Options);
                 if (c != IsChecked)
                     CheckedChanged?.Invoke(this);
                 IsChecked = c;

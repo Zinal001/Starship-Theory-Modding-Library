@@ -39,6 +39,12 @@ namespace StarshipTheory.ModLib.GUI
         public String Tooltip { get; set; }
 
         /// <summary>
+        /// <para>Gets or sets the style of this element.</para>
+        /// <para>Note: The element will use it's default style if this value is null</para>
+        /// </summary>
+        public virtual UnityEngine.GUIStyle Style { get; set; }
+
+        /// <summary>
         /// An optional list of layout options that specify extra layouting properties.
         /// </summary>
         public UnityEngine.GUILayoutOption[] Options { get; set; }
@@ -54,7 +60,7 @@ namespace StarshipTheory.ModLib.GUI
         public event StateChangedDelegate VisibilityChanged;
 
         /// <summary>
-        /// The method that actually drawn the element on the screen.
+        /// The method that actually draws the element on the screen.
         /// </summary>
         internal abstract void Draw();
 

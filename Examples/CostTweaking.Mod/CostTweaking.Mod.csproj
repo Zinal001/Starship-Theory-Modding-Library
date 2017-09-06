@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{94680F16-F033-45C9-A3CC-C4ED8C187DF8}</ProjectGuid>
+    <ProjectGuid>{3B871133-CDD3-47C8-8911-586598547046}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StarshipTheory.ModLib</RootNamespace>
-    <AssemblyName>StarshipTheory.ModLib</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>CostTweaking.Mod</RootNamespace>
+    <AssemblyName>CostTweaking.Mod</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,11 +34,23 @@
       <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ES2">
       <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="StarshipTheory.ModLib">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\StarshipTheory.ModLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
@@ -52,30 +63,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractMod.cs" />
-    <Compile Include="GUI\Area.cs" />
-    <Compile Include="GUI\Box.cs" />
-    <Compile Include="GUI\Button.cs" />
-    <Compile Include="GUI\Group.cs" />
-    <Compile Include="GUI\GUIItem.cs" />
-    <Compile Include="GUI\Label.cs" />
-    <Compile Include="GUI\PasswordField.cs" />
-    <Compile Include="GUI\RepeatButton.cs" />
-    <Compile Include="GUI\Scrollbar.cs" />
-    <Compile Include="GUI\ScrollView.cs" />
-    <Compile Include="GUI\SelectionGrid.cs" />
-    <Compile Include="GUI\Slider.cs" />
-    <Compile Include="GUI\Space.cs" />
-    <Compile Include="GUI\TextArea.cs" />
-    <Compile Include="GUI\TextField.cs" />
-    <Compile Include="GUI\Toggle.cs" />
-    <Compile Include="GUI\Toolbar.cs" />
-    <Compile Include="GUI\Window.cs" />
-    <Compile Include="ModGUI.cs" />
-    <Compile Include="ModLoader.cs" />
+    <Compile Include="CostTweaking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources\Costs.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "CostTweaking.Mod.dll" "F:\Games\Steam\steamapps\common\Starship Theory\Mods\CostTweaking.Mod.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

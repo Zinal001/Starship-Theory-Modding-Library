@@ -39,9 +39,12 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
+            if (this.Style == null)
+                this.Style = UnityEngine.GUI.skin.textField;
+
             if (this.Visible)
             {
-                String newPass = UnityEngine.GUILayout.PasswordField(Password, MaskChar, Options);
+                String newPass = UnityEngine.GUILayout.PasswordField(Password, MaskChar, Style, Options);
                 if (newPass != Password)
                     PasswordChanged?.Invoke(this);
                 Password = newPass;

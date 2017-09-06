@@ -53,14 +53,17 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
+            if (this.Style == null)
+                this.Style = (SliderDirection == Direction.Horizontal ? UnityEngine.GUI.skin.horizontalSlider : UnityEngine.GUI.skin.verticalSlider);
+
+            if (this.Visible)
             {
                 float value = 0;
 
                 if(SliderDirection == Direction.Horizontal)
-                    value = UnityEngine.GUILayout.HorizontalSlider(Value, Minumum, Maximum, Options);
+                    value = UnityEngine.GUILayout.HorizontalSlider(Value, Minumum, Maximum, Style, UnityEngine.GUI.skin.horizontalSliderThumb, Options);
                 else
-                    value = UnityEngine.GUILayout.VerticalSlider(Value, Minumum, Maximum, Options);
+                    value = UnityEngine.GUILayout.VerticalSlider(Value, Minumum, Maximum, Style, UnityEngine.GUI.skin.verticalSliderThumb, Options);
 
                 if (value != Value)
                     ValueChanged?.Invoke(this);

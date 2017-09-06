@@ -92,6 +92,7 @@
     <Compile Include="Patches\GUIPatch.cs" />
     <Compile Include="Patches\MainMenuPatch.cs" />
     <Compile Include="Patches\ModLoaderPatch.cs" />
+    <Compile Include="Patches\ResourcePatch.cs" />
     <Compile Include="PatchInjector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

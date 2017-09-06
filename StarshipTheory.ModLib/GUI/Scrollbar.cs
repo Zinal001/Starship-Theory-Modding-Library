@@ -35,14 +35,17 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
+            if (this.Style == null)
+                this.Style = SliderDirection == Direction.Horizontal ? UnityEngine.GUI.skin.horizontalScrollbar : UnityEngine.GUI.skin.verticalScrollbar;
+
             if (this.Visible)
             {
                 float value = 0;
 
                 if (SliderDirection == Direction.Horizontal)
-                    value = UnityEngine.GUILayout.HorizontalScrollbar(Value, Size, Minumum, Maximum, Options);
+                    value = UnityEngine.GUILayout.HorizontalScrollbar(Value, Size, Minumum, Maximum, Style, Options);
                 else
-                    value = UnityEngine.GUILayout.VerticalScrollbar(Value, Size, Minumum, Maximum, Options);
+                    value = UnityEngine.GUILayout.VerticalScrollbar(Value, Size, Minumum, Maximum, Style, Options);
 
                 if (value != Value)
                     ValueChanged?.Invoke(this);

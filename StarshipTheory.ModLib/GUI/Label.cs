@@ -46,8 +46,11 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
-                UnityEngine.GUILayout.Label(new UnityEngine.GUIContent(Text, Image, Tooltip), Options);
+            if (this.Style == null)
+                this.Style = UnityEngine.GUI.skin.label;
+
+            if (this.Visible)
+                UnityEngine.GUILayout.Label(new UnityEngine.GUIContent(Text, Image, Tooltip), Style, Options);
         }
     }
 }

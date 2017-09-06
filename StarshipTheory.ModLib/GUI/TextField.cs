@@ -32,9 +32,12 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
+            if (this.Style == null)
+                this.Style = UnityEngine.GUI.skin.textField;
+
+            if (this.Visible)
             {
-                String newText = UnityEngine.GUILayout.TextField(Text, Options);
+                String newText = UnityEngine.GUILayout.TextField(Text, Style, Options);
                 if (newText != Text)
                     TextChanged?.Invoke(this);
                 Text = newText;

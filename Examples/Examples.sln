@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debug.Mod", "Debug.Mod\Debug.Mod.csproj", "{CBF36880-3CBE-4467-B7F7-0A803C9EA344}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CostTweaking.Mod", "CostTweaking.Mod\CostTweaking.Mod.csproj", "{3B871133-CDD3-47C8-8911-586598547046}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{CBF36880-3CBE-4467-B7F7-0A803C9EA344}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBF36880-3CBE-4467-B7F7-0A803C9EA344}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBF36880-3CBE-4467-B7F7-0A803C9EA344}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B871133-CDD3-47C8-8911-586598547046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B871133-CDD3-47C8-8911-586598547046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B871133-CDD3-47C8-8911-586598547046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B871133-CDD3-47C8-8911-586598547046}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

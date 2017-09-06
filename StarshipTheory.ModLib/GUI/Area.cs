@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace StarshipTheory.ModLib.GUI
 {
@@ -38,9 +39,12 @@ namespace StarshipTheory.ModLib.GUI
 
         internal override void Draw()
         {
-            if(this.Visible)
+            if(this.Style == null)
+                this.Style = UnityEngine.GUI.skin.box;
+
+            if (this.Visible)
             {
-                UnityEngine.GUILayout.BeginArea(Size);
+                UnityEngine.GUILayout.BeginArea(Size, Style);
 
                 foreach(GUIItem item in Items)
                 {
