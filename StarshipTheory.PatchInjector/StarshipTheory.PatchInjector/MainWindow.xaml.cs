@@ -37,11 +37,12 @@ namespace StarshipTheory.PatchInjector
 
         private void file_executable_TextChanged(object sender, Controls.FileTextboxChangedEventArgs e)
         {
+            btnPatch.IsEnabled = false;
+            String AppDir = null;
+
             if (String.IsNullOrEmpty(file_executable.Filename))
                 return;
 
-            btnPatch.IsEnabled = false;
-            String AppDir = null;
             if (File.Exists(file_executable.Filename))
             {
                 if (Directory.Exists(Path.Combine(new FileInfo(file_executable.Filename).Directory.FullName, "StarshipTheory_Data")))
