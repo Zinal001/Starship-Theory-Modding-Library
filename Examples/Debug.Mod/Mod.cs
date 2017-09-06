@@ -2,7 +2,7 @@
 using StarshipTheory.ModLib;
 using UnityEngine;
 
-namespace Test.Mod
+namespace Debug.Mod
 {
     public class Mod : AbstractMod
     {
