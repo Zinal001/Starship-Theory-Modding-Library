@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{94680F16-F033-45C9-A3CC-C4ED8C187DF8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>StarshipTheory.ModLib</RootNamespace>
+    <AssemblyName>StarshipTheory.ModLib</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ES2">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AbstractMod.cs" />
+    <Compile Include="GUI\Area.cs" />
+    <Compile Include="GUI\Box.cs" />
+    <Compile Include="GUI\Button.cs" />
+    <Compile Include="GUI\Group.cs" />
+    <Compile Include="GUI\GUIItem.cs" />
+    <Compile Include="GUI\Label.cs" />
+    <Compile Include="GUI\PasswordField.cs" />
+    <Compile Include="GUI\RepeatButton.cs" />
+    <Compile Include="GUI\Scrollbar.cs" />
+    <Compile Include="GUI\ScrollView.cs" />
+    <Compile Include="GUI\SelectionGrid.cs" />
+    <Compile Include="GUI\Slider.cs" />
+    <Compile Include="GUI\TextArea.cs" />
+    <Compile Include="GUI\TextField.cs" />
+    <Compile Include="GUI\Toggle.cs" />
+    <Compile Include="GUI\Toolbar.cs" />
+    <Compile Include="GUI\Window.cs" />
+    <Compile Include="ModGUI.cs" />
+    <Compile Include="ModLoader.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
