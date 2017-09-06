@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{AD6F9229-8258-434C-9860-CEE9E880EC38}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>StarshipTheory.ModInjector</RootNamespace>
-    <AssemblyName>StarshipTheory.ModInjector</AssemblyName>
+    <RootNamespace>StarshipTheory.PatchInjector</RootNamespace>
+    <AssemblyName>StarshipTheory.PatchInjector</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

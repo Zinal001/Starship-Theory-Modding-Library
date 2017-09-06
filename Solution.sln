@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarshipTheory.ModInjector", "StarshipTheory.ModInjector\StarshipTheory.ModInjector.csproj", "{AD6F9229-8258-434C-9860-CEE9E880EC38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarshipTheory.PatchInjector", "StarshipTheory.PatchInjector\StarshipTheory.PatchInjector\StarshipTheory.PatchInjector.csproj", "{AD6F9229-8258-434C-9860-CEE9E880EC38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarshipTheory.ModLib", "..\StarshipTheory.ModLib\StarshipTheory.ModLib.csproj", "{94680F16-F033-45C9-A3CC-C4ED8C187DF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarshipTheory.ModLib", "StarshipTheory.ModLib\StarshipTheory.ModLib.csproj", "{94680F16-F033-45C9-A3CC-C4ED8C187DF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C540DEC7-0F94-417B-9EC0-418B67CFE346}
+		SolutionGuid = {5EA70452-CA83-4D01-977F-167EDEB3F836}
 	EndGlobalSection
 EndGlobal

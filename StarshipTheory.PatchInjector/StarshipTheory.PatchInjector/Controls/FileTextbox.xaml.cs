@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace StarshipTheory.ModInjector.Controls
+namespace StarshipTheory.PatchInjector.Controls
 {
     /// <summary>
     /// Interaction logic for FileTextbox.xaml

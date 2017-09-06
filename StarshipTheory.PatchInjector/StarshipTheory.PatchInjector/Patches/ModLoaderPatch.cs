@@ -5,7 +5,7 @@ using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace StarshipTheory.ModInjector.Patches
+namespace StarshipTheory.PatchInjector.Patches
 {
     class ModLoaderPatch : BasePatch
     {

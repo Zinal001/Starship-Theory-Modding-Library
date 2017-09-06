@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace StarshipTheory.ModInjector.Patches
+namespace StarshipTheory.PatchInjector.Patches
 {
     class AccessPatch : BasePatch
     {

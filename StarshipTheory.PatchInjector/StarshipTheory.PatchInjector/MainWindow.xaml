@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:StarshipTheory.ModInjector"
-        xmlns:Controls="clr-namespace:StarshipTheory.ModInjector.Controls" x:Class="StarshipTheory.ModInjector.MainWindow"
+        xmlns:local="clr-namespace:StarshipTheory.PatchInjector"
+        xmlns:Controls="clr-namespace:StarshipTheory.PatchInjector.Controls" x:Class="StarshipTheory.PatchInjector.MainWindow"
         mc:Ignorable="d"
         Title="Starship Theory - Patch Injector" Height="222.549" Width="525" Loaded="Window_Loaded">
     <Grid Margin="6">

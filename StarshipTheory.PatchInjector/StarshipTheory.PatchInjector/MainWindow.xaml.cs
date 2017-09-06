@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using System.IO;
 
-namespace StarshipTheory.ModInjector
+namespace StarshipTheory.PatchInjector
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

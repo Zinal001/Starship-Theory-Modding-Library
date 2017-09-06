@@ -1,7 +1,7 @@
-﻿<Application x:Class="StarshipTheory.ModInjector.App"
+﻿<Application x:Class="StarshipTheory.PatchInjector.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:StarshipTheory.ModInjector"
+             xmlns:local="clr-namespace:StarshipTheory.PatchInjector"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

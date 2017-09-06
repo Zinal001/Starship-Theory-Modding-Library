@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Mono.Cecil;
 
-namespace StarshipTheory.ModInjector.Patches
+namespace StarshipTheory.PatchInjector.Patches
 {
     abstract class BasePatch
     {
