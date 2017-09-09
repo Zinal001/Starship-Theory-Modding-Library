@@ -29,7 +29,6 @@ namespace Debug.Mod
             //Find the Manager gameobject in the current scene
             //The manager gameobject contains most, if not all, components in the scene.
             _Manager = GameObject.Find("Manager");
-
             
         }
 

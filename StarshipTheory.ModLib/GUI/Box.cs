@@ -44,7 +44,7 @@ namespace StarshipTheory.ModLib.GUI
         /// <param name="image">Texture to display on the box.</param>
         public Box(UnityEngine.Texture image) : this(image, "") { }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.box;

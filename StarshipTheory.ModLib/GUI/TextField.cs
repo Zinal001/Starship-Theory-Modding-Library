@@ -22,6 +22,11 @@ namespace StarshipTheory.ModLib.GUI
         public event TextFieldEventDelegate TextChanged;
 
         /// <summary>
+        /// Can this TextField be edited by a user?
+        /// </summary>
+        public bool IsEditable { get; set; } = true;
+
+        /// <summary>
         /// Creates a new TextField.
         /// </summary>
         /// <param name="text">Text to edit.</param>
@@ -30,7 +35,7 @@ namespace StarshipTheory.ModLib.GUI
             this.Text = text;
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.textField;
@@ -38,9 +43,12 @@ namespace StarshipTheory.ModLib.GUI
             if (this.Visible)
             {
                 String newText = UnityEngine.GUILayout.TextField(Text, Style, Options);
-                if (newText != Text)
+
+                if (IsEditable && newText != Text)
                     TextChanged?.Invoke(this);
-                Text = newText;
+
+                if(IsEditable)
+                    Text = newText;
             }
         }
     }

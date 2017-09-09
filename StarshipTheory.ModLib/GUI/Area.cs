@@ -10,7 +10,7 @@ namespace StarshipTheory.ModLib.GUI
     /// A wrapper class for the GUILayout.Area Unity method
     /// <see>https://docs.unity3d.com/ScriptReference/GUILayout.BeginArea.html</see>
     /// </summary>
-    public class Area : GUIItem
+    public class Area : GUIItem, IGroupItem
     {
         /// <summary>
         /// The position, width and height of this area.
@@ -37,13 +37,14 @@ namespace StarshipTheory.ModLib.GUI
         }
 
 
-        internal override void Draw()
+        public override void Draw()
         {
             if(this.Style == null)
                 this.Style = UnityEngine.GUI.skin.box;
 
             if (this.Visible)
             {
+                GroupDepth++;
                 UnityEngine.GUILayout.BeginArea(Size, Style);
 
                 foreach(GUIItem item in Items)
@@ -53,6 +54,7 @@ namespace StarshipTheory.ModLib.GUI
                 }
 
                 UnityEngine.GUILayout.EndArea();
+                GroupDepth--;
             }
         }
     }

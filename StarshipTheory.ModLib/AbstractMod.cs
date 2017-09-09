@@ -6,7 +6,7 @@ namespace StarshipTheory.ModLib
 {
     /// <summary>
     /// <para>The abstract Mod class.</para>
-    /// <para>Note: The exported dll file needs to end with .Mod.dll for the modloader to recognize it as a mod</para>
+    /// <para>Note: The exported dll filename needs to end with .Mod.dll for the modloader to recognize it as a mod</para>
     /// </summary>
     public abstract class AbstractMod
     {
@@ -34,6 +34,11 @@ namespace StarshipTheory.ModLib
         /// The GUI window for this mod
         /// </summary>
         public GUI.Window ModWindow { get; internal set; }
+
+        /// <summary>
+        /// Can the GUI Window for this mod be shown?
+        /// </summary>
+        public bool CanShowModWindow { get; set; } = true;
 
         internal bool _FirstGuiPassCalled = false;
 

@@ -37,7 +37,7 @@ namespace StarshipTheory.ModLib.GUI
             this.MaskChar = maskChar;
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.textField;

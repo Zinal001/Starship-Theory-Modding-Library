@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="Patches\AccessPatch.cs" />
     <Compile Include="Patches\BasePatch.cs" />
+    <Compile Include="Patches\DataPatch.cs" />
     <Compile Include="Patches\GUIPatch.cs" />
     <Compile Include="Patches\MainMenuPatch.cs" />
     <Compile Include="Patches\ModLoaderPatch.cs" />

@@ -53,14 +53,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractMod.cs" />
+    <Compile Include="Data\ES2_UserType_CostSaveData.cs" />
+    <Compile Include="Data\SaveLoadData.cs" />
     <Compile Include="GUI\Area.cs" />
     <Compile Include="GUI\Box.cs" />
     <Compile Include="GUI\Button.cs" />
+    <Compile Include="GUI\FlexibleSpace.cs" />
     <Compile Include="GUI\Group.cs" />
     <Compile Include="GUI\GUIItem.cs" />
+    <Compile Include="GUI\IGroupItem.cs" />
     <Compile Include="GUI\Label.cs" />
     <Compile Include="GUI\PasswordField.cs" />
     <Compile Include="GUI\RepeatButton.cs" />
+    <Compile Include="GUI\ResizeWindow.cs" />
     <Compile Include="GUI\Scrollbar.cs" />
     <Compile Include="GUI\ScrollView.cs" />
     <Compile Include="GUI\SelectionGrid.cs" />

@@ -35,6 +35,9 @@
       <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ES2">
+      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
+    </Reference>
     <Reference Include="StarshipTheory.ModLib">
       <HintPath>..\..\StarshipTheory.ModLib\bin\Debug\StarshipTheory.ModLib.dll</HintPath>
     </Reference>

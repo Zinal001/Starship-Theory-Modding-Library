@@ -10,7 +10,7 @@ namespace StarshipTheory.ModLib.GUI
     /// <see>https://docs.unity3d.com/ScriptReference/GUILayout.BeginHorizontal.html</see>
     /// <see>https://docs.unity3d.com/ScriptReference/GUILayout.BeginVertical.html</see>
     /// </summary>
-    public class Group : GUIItem
+    public class Group : GUIItem, IGroupItem
     {
         /// <summary>
         /// The direction of this Group.
@@ -37,12 +37,13 @@ namespace StarshipTheory.ModLib.GUI
         }
 
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Visible)
             {
                 Direction dir = LayoutDirection;
-                if(Style != null)
+                GroupDepth++;
+                if (Style != null)
                 {
                     if (dir == Direction.Horizontal)
                         UnityEngine.GUILayout.BeginHorizontal(Style, this.Options);
@@ -67,6 +68,7 @@ namespace StarshipTheory.ModLib.GUI
                     UnityEngine.GUILayout.EndHorizontal();
                 else
                     UnityEngine.GUILayout.EndVertical();
+                GroupDepth--;
             }
         }
     }

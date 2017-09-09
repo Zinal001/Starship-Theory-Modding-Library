@@ -17,6 +17,8 @@ namespace CostTweaking.Mod
 
         public override Version ModVersion => new Version("1.0.0");
 
+        private Dictionary<String, List<TextField>> _fields = new Dictionary<string, List<TextField>>();
+
         public override void OnInitialize()
         {
             _Manager = GameObject.Find("Manager");
@@ -36,17 +38,21 @@ namespace CostTweaking.Mod
 
             foreach (EntityCost cost in Costs.GetEntityCosts())
             {
-                Group costGroup = new Group(GUIItem.Direction.Vertical);
+                if (!_fields.ContainsKey(cost.Internal_Name))
+                    _fields[cost.Internal_Name] = new List<TextField>();
+
+                Group costGroup = new Group(GUIItem.Direction.Vertical) { Tag = cost.Internal_Name };
                 costGroup.Items.Add(new Label(cost.Name) { Style = captionStyle });
                 foreach (String resource in resources)
                 {
                     Group resGroup = new Group(GUIItem.Direction.Horizontal);
-                    resGroup.Items.Add(new Label(resource));
+                    resGroup.Items.Add(new Label(resource == "TileHP" ? "Structure" : resource));
                     TextField resField = new TextField(cost.GetCost(resource).ToString())
                     {
                         Tag = resource,
-                        Options = new GUILayoutOption[] { GUILayout.Width(200) }
+                        MaxWidth = 200
                     };
+                    _fields[cost.Internal_Name].Add(resField);
                     resField.TextChanged += ResField_TextChanged;
 
                     resGroup.Items.Add(resField);
@@ -63,12 +69,61 @@ namespace CostTweaking.Mod
                 view.Items.Add(costGroup);
             }
 
+            ModWindow.Rect = new Rect(ModWindow.Rect.x, ModWindow.Rect.y, ModWindow.Rect.width, 200);
+
             ModWindow.Items.Add(view);
         }
 
         private void ResBtn_Clicked(GUIItem item)
         {
             Button btn = item as Button;
+            Group costGroup = btn.Tag as Group;
+            String cost_name = costGroup.Tag as String;
+
+            MouseUI mUI = _Manager.GetComponent<MouseUI>().Get_Manager().GetComponent<MouseUI>();
+
+            EntityCost cost = Costs.GetEntityCost(cost_name);
+            foreach (GUIItem costItem in costGroup.Items)
+            {
+                TextField txt = null;
+                if (costItem is TextField)
+                    txt = costItem as TextField;
+                else if(costItem is Group)
+                {
+                    foreach(GUIItem gItem in ((Group)costItem).Items)
+                    {
+                        if(gItem is TextField)
+                        {
+                            txt = gItem as TextField;
+                            break;
+                        }
+                    }
+                }
+
+                if(txt != null)
+                {
+                    String resource = txt.Tag as String;
+                    if (int.TryParse(txt.Text, out int val))
+                    {
+                        Debug.Log("Setting " + resource + " of " + cost_name + " to " + val);
+                        cost.SetCost(resource, val);
+                    }
+                    else
+                    {
+                        txt.Text = cost.GetCost(resource).ToString();
+                        Debug.Log("Failed to set " + resource + " of " + cost_name + ": Not a Number");
+                    }
+                }
+            }
+            Costs.SetEntityCost(cost);
+
+            if (mUI != null)
+                mUI.updateBuildInfomation("ButtonBuild" + cost.Internal_Name);
+
+            ManagerResources res = _Manager.GetComponent<ManagerResources>();
+            if (res != null && res.Get_TileMap() != null)
+                res.updateResourcePanel(res.Get_TileMap());
+
         }
 
         private void ResField_TextChanged(GUIItem item)
@@ -76,9 +131,30 @@ namespace CostTweaking.Mod
             TextField textField = item as TextField;
         }
 
-        public override void OnGameStarted()
+        public override void OnGameLoad(int saveSlot)
         {
-            base.OnGameStarted();
+            String path = _Manager.GetComponent<ManagerOptions>().Get_path() + "SaveData" + saveSlot.ToString();
+            if (ES2.Exists(path))
+            {
+                if(ES2.Exists(path + "?tag=CostTweaking_Costs"))
+                {
+                    EntityCost[] costsData = ES2.LoadArray<EntityCost>(path + "?tag=CostTweaking_Costs");
+                    foreach(EntityCost data in costsData)
+                    {
+                        Costs.SetEntityCost(data);
+                        if(_fields.ContainsKey(data.Internal_Name))
+                        {
+                            foreach (TextField field in _fields[data.Internal_Name])
+                                field.Text = data.GetCost(field.Tag as String).ToString();
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void OnGameSave(int saveSlot)
+        {
+            ES2.Save<EntityCost>(Costs.GetEntityCosts(), _Manager.GetComponent<ManagerOptions>().Get_path() + "SaveData" + saveSlot.ToString() + "?tag=CostTweaking_Costs");
         }
     }
 }

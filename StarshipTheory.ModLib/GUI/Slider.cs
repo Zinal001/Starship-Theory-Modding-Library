@@ -51,7 +51,7 @@ namespace StarshipTheory.ModLib.GUI
             this.Maximum = maximum;
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = (SliderDirection == Direction.Horizontal ? UnityEngine.GUI.skin.horizontalSlider : UnityEngine.GUI.skin.verticalSlider);

@@ -16,22 +16,50 @@ namespace StarshipTheory.ModLib.GUI
         /// </summary>
         public new event TextFieldEventDelegate TextChanged;
 
+        /// <summary>
+        /// Does this TextArea support rich text tags?
+        /// <see>https://docs.unity3d.com/Manual/StyledText.html</see>
+        /// </summary>
+        public bool IsRichText
+        {
+            get
+            {
+                return _SetRichText.HasValue ? _SetRichText.Value : Style.richText;
+            }
+            set
+            {
+                _SetRichText = value;
+            }
+        }
+
+        private bool? _SetRichText = null;
+
+
         public TextArea(String text = "") : base(text)
         {
 
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
-                this.Style = UnityEngine.GUI.skin.textArea;
+                this.Style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.textArea);
+
+            if (_SetRichText.HasValue)
+            {
+                this.Style.richText = _SetRichText.Value;
+                _SetRichText = null;
+            }
 
             if (this.Visible)
             {
                 String newText = UnityEngine.GUILayout.TextArea(Text, Style, Options);
-                if (newText != Text)
+
+                if (IsEditable && newText != Text)
                     TextChanged?.Invoke(this);
-                Text = newText;
+
+                if(IsEditable)
+                    Text = newText;
             }
         }
     }

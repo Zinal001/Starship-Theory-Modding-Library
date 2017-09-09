@@ -32,7 +32,7 @@ namespace StarshipTheory.ModLib.GUI
             this.NumRows = numRows;
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.button;

@@ -20,6 +20,8 @@ namespace StarshipTheory.ModLib
         private GUI.Area _ModListButtonArea;
         private GUI.Button _ToggleModListBtn;
 
+        private GUI.Window _debugWindow;
+
         public ModLoader()
         {
             Instance = this;
@@ -33,7 +35,7 @@ namespace StarshipTheory.ModLib
         {
             _Mods = new List<AbstractMod>();
 
-            _ModListButtonArea = new GUI.Area(new UnityEngine.Rect(UnityEngine.Screen.width - 100, 0, 100, UnityEngine.Screen.height));
+            _ModListButtonArea = new GUI.Area(new UnityEngine.Rect(UnityEngine.Screen.width - 100, 0, 100, UnityEngine.Screen.height)) { MaxWidth = 200, MaxHeight = 400 };
             _ToggleModListBtn = new GUI.Button("Mods");
             _ToggleModListBtn.Clicked += ToggleModListBtn_Clicked;
             _ModListButtonArea.Items.Add(_ToggleModListBtn);
@@ -68,7 +70,17 @@ namespace StarshipTheory.ModLib
                         AbstractMod M = (AbstractMod)Activator.CreateInstance(T);
                         if (M != null)
                         {
-                            M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.ModName) { Visible = false, IsDraggable = true, IsResizeable = true };
+                            M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.ModName)
+                            {
+                                Visible = false,
+                                IsDraggable = true,
+                                IsResizeable = true,
+                                _drawingMod = M,
+                                MinWidth = 200,
+                                MaxWidth = UnityEngine.Screen.width,
+                                MinHeight = 20,
+                                MaxHeight =  UnityEngine.Screen.height
+                            };
 
                             M.ModFolder = DllFile.Directory.FullName;
                             M.Enabled = true;
@@ -87,6 +99,7 @@ namespace StarshipTheory.ModLib
                 }
                 catch(Exception ex)
                 {
+                    ShowError(DllFile.Name.Replace(".Mod.dll", ""), "", ex, "Load");
                     UnityEngine.Debug.LogError("Failed to initialize mod from file " + DllFile.Name + ": " + ex.Message);
                 }
             }
@@ -102,6 +115,7 @@ namespace StarshipTheory.ModLib
                 catch(Exception ex)
                 {
                     //TODO: Show Mod error window
+                    ShowError(M, ex, "Initialization");
                     UnityEngine.Debug.LogError(ex);
                 }
             }
@@ -123,6 +137,7 @@ namespace StarshipTheory.ModLib
                 catch(Exception ex)
                 {
                     //TODO: Show Mod error window
+                    ShowError(M, ex, "Game Started");
                     UnityEngine.Debug.LogError(ex);
                 }
             }
@@ -143,6 +158,7 @@ namespace StarshipTheory.ModLib
                 catch (Exception ex)
                 {
                     //TODO: Show Mod error window
+                    ShowError(M, ex, "Game Loaded");
                     UnityEngine.Debug.LogError(ex);
                 }
             }
@@ -163,11 +179,13 @@ namespace StarshipTheory.ModLib
                 catch (Exception ex)
                 {
                     //TODO: Show Mod error window
+                    ShowError(M, ex, "Game Saved");
                     UnityEngine.Debug.LogError(ex);
                 }
             }
         }
 
+        private bool _FirstPass = true;
         private bool _ModAreaResized = false;
 
         /// <summary>
@@ -176,15 +194,28 @@ namespace StarshipTheory.ModLib
         /// </summary>
         public void __OnGui()
         {
-            if(ManagerMenu.mainMenuActive)
+            if(_FirstPass)
+            {
+                _FirstPass = false;
+                _debugWindow = new GUI.Window(ModGUI.GetWindowIndex(), "Mod Debug") { Visible = false, IsDraggable = true, IsResizeable = true };
+                _debugWindow.Rect = new UnityEngine.Rect((UnityEngine.Screen.width - 400) / 2, (UnityEngine.Screen.height - 400) / 2, 400, 400);
+                _debugWindow.Items.Add(new GUI.TextArea() { IsRichText = true, IsEditable = false });
+                GUI.Button closeDebugBtn = new GUI.Button("Close");
+                closeDebugBtn.Clicked += CloseDebugBtn_Clicked;
+                _debugWindow.Items.Add(new GUI.FlexibleSpace());
+                _debugWindow.Items.Add(closeDebugBtn);
+            }
+
+            _debugWindow.__Draw();
+
+            if (ManagerMenu.mainMenuActive)
             {
                 if(!_ModAreaResized)
                 {
-                    _ModListButtonArea.Options = new UnityEngine.GUILayoutOption[] { UnityEngine.GUILayout.MaxWidth(400), UnityEngine.GUILayout.MinWidth(200) };
                     _ModAreaResized = true;
                 }
 
-                _ModListButtonArea.Draw();
+                _ModListButtonArea.__Draw();
             }
 
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
@@ -192,34 +223,28 @@ namespace StarshipTheory.ModLib
                 try
                 {
                     if (!M._FirstGuiPassCalled)
-                    {
-                        if(M.ModWindow.IsResizeable)
-                        {
-                            M.ModWindow.Options = new UnityEngine.GUILayoutOption[]
-                            {
-                                UnityEngine.GUILayout.MinWidth(200),
-                                UnityEngine.GUILayout.MinHeight(20),
-                                UnityEngine.GUILayout.MaxWidth(UnityEngine.Screen.width),
-                                UnityEngine.GUILayout.MaxHeight(UnityEngine.Screen.height)
-                            };
-
-                        }
-                            
+                    {                            
                         M.FirstGUIPass();
                         M._FirstGuiPassCalled = true;
                     }
 
-                    if (ManagerMenu.mainMenuActive)
-                        M.ModWindow.Draw();
+                    if (ManagerMenu.mainMenuActive && M.CanShowModWindow)
+                        M.ModWindow.__Draw();
 
                     M.OnGUI();
                 }
                 catch(Exception ex)
                 {
                     //TODO: Show Mod error window
+                    ShowError(M, ex, "GUI");
                     UnityEngine.Debug.LogError(ex);
                 }
             }
+        }
+
+        private void CloseDebugBtn_Clicked(GUI.GUIItem item)
+        {
+            _debugWindow.Visible = false;
         }
 
         private void ModBtn_Clicked(GUI.GUIItem item)
@@ -239,12 +264,22 @@ namespace StarshipTheory.ModLib
                 foreach (GUI.Button modbtn in _ModListButtonArea.Items)
                 {
                     modbtn.Visible = true;
-                    UnityEngine.Vector2 size = modbtn.Style.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
+
+                    UnityEngine.Vector2 size;
+
+                    if (modbtn.Style != null)
+                        size = modbtn.Style.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
+                    else
+                        size = UnityEngine.GUI.skin.button.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
+
+                    UnityEngine.Debug.Log(modbtn.Text + ": " + size.x + ", " + size.y);
+
                     if (size.x > MaxWidth)
                         MaxWidth = size.x;
                 }
 
-                _ModListButtonArea.Size = new UnityEngine.Rect(UnityEngine.Screen.width - MaxWidth, 0, MaxWidth, UnityEngine.Screen.height);
+                _ModListButtonArea.Size = new UnityEngine.Rect((float)UnityEngine.Screen.width - MaxWidth, 0, MaxWidth, (float)UnityEngine.Screen.height);
+                UnityEngine.Debug.Log("ModListArea: (" + _ModListButtonArea.Size.x + ", " + _ModListButtonArea.Size.y + ", " + _ModListButtonArea.Size.width + ", " + _ModListButtonArea.Size.height);
             }
             else
             {
@@ -254,6 +289,62 @@ namespace StarshipTheory.ModLib
                         modbtn.Visible = false;
                 }
             }
+        }
+
+        internal void ShowError(AbstractMod m, Exception error, String where = "")
+        {
+            ShowError(m.ModName, m.ModVersion.ToString(), error, where);
+        }
+
+        internal void ShowError(String modName, String modVersion, Exception error, String where = "")
+        {
+            UnityEngine.Debug.Log("Showing Error");
+            _debugWindow.Title = "Error - " + modName + (!String.IsNullOrEmpty(modVersion) ? (" (" + modVersion + ")") : "");
+            GUI.TextArea log = (GUI.TextArea)_debugWindow.Items.First();
+
+            String msg = "<color=red>";
+            if (!String.IsNullOrEmpty(where))
+                msg += "<b>" + modName + "</b> threw an error during the <i>" + where + " process</i>\n";
+            else
+                msg += "<b>" + modName + "</b> threw an error:\n";
+
+            msg += ExceptionToMessage(error);
+
+            msg += "</color>";
+
+            log.Text = msg;
+
+            _debugWindow.Visible = true;
+        }
+
+        private String ExceptionToMessage(Exception ex, int indentC = 0)
+        {
+            String indent = "";
+            for (int i = 0; i < indentC; i++)
+                indent += "  ";
+
+            String str = indent + "<b>Exception Type:</b> " + ex.GetType().Name + "\n";
+            str += indent + "<b>Message:</b> " + ex.Message + "\n";
+            if(ex.Data != null && ex.Data.Count > 0)
+            {
+                str += indent + "<b>Data:</b>\n";
+                foreach(Object Key in ex.Data.Keys)
+                    str += indent + "  " + Key.ToString() + " = " + ex.Data[Key].ToString() + "\n";
+            }
+
+            if(!String.IsNullOrEmpty(ex.Source))
+                str += indent + "<b>Source:</b> " + ex.Source + "\n";
+
+            if (!String.IsNullOrEmpty(ex.StackTrace))
+                str += indent + "<b>Stacktrace:</b> " + ex.StackTrace + "\n";
+
+            if (ex.InnerException != null)
+            {
+                str += indent + "<b>Inner Exception:</b>\n";
+                str += ExceptionToMessage(ex.InnerException, indentC + 1);
+            }
+
+            return str;
         }
     }
 }

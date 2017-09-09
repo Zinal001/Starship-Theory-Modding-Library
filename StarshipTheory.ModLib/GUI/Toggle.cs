@@ -58,7 +58,7 @@ namespace StarshipTheory.ModLib.GUI
         /// <param name="isChecked">Is the button on or off?</param>
         public Toggle(UnityEngine.Texture image, bool isChecked = false) : this("", image, isChecked) { }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.button;

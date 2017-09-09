@@ -9,7 +9,7 @@ namespace StarshipTheory.ModLib.GUI
     /// A wrapper class for the GUILayout.BeginScrollView Unity method
     /// <see>https://docs.unity3d.com/ScriptReference/GUILayout.BeginScrollView.html</see>
     /// </summary>
-    public class ScrollView : GUIItem
+    public class ScrollView : GUIItem, IGroupItem
     {
         /// <summary>
         /// The current position of the viewable area.
@@ -66,13 +66,14 @@ namespace StarshipTheory.ModLib.GUI
                 this.Items = items.ToList();
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.scrollView;
 
             if (this.Visible)
             {
+                GroupDepth++;
                 UnityEngine.Vector2 pos = UnityEngine.GUILayout.BeginScrollView(ScrollPosition, AlwaysShowHorizontal, AlwaysShowVertical, UnityEngine.GUI.skin.horizontalScrollbar, UnityEngine.GUI.skin.verticalScrollbar, Style, Options);
                 if (pos != ScrollPosition)
                     ScrollChanged?.Invoke(this);
@@ -85,6 +86,7 @@ namespace StarshipTheory.ModLib.GUI
                 }
 
                 UnityEngine.GUILayout.EndScrollView();
+                GroupDepth--;
             }
         }
     }

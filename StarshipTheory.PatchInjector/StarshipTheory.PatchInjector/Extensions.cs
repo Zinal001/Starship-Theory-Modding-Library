@@ -37,6 +37,11 @@ namespace StarshipTheory.PatchInjector
             return typeDef.Methods.Single(m => m.Name == name && m.Parameters.Count > 0 && m.Parameters.First().ParameterType.Name == param1Type.Name);
         }
 
+        public static MethodDefinition GetMethodByName(this TypeDefinition typeDef, String name, int numParams, TypeReference param1Type)
+        {
+            return typeDef.Methods.Single(m => m.Name == name && m.Parameters.Count == numParams && m.Parameters.First().ParameterType.Name == param1Type.Name);
+        }
+
         public static void InjectInstructionsToEnd(this ILProcessor Processor, IEnumerable<Instruction> Instructions)
         {
             if(Processor.Body.Instructions.Count > 0)

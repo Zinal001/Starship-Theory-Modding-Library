@@ -25,7 +25,7 @@ namespace StarshipTheory.ModLib.GUI
             this.Size = Size;
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (this.Visible)
                 UnityEngine.GUILayout.Space(Size);

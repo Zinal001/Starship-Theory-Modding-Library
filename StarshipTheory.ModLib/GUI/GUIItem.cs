@@ -47,7 +47,22 @@ namespace StarshipTheory.ModLib.GUI
         /// <summary>
         /// An optional list of layout options that specify extra layouting properties.
         /// </summary>
-        public UnityEngine.GUILayoutOption[] Options { get; set; }
+        protected UnityEngine.GUILayoutOption[] Options { get; set; }
+
+        public float? MinWidth { get; set; }
+        public float? MaxWidth { get; set; }
+        public float? MinHeight { get; set; }
+        public float? MaxHeight { get; set; }
+
+        protected UnityEngine.Rect? _ItemRect { get; private set; }
+
+        public bool MouseHovering
+        {
+            get
+            {
+                return _ItemRect.HasValue && _ItemRect.Value.Contains(UnityEngine.Event.current.mousePosition);
+            }
+        }
 
         public GUIItem()
         {
@@ -59,10 +74,65 @@ namespace StarshipTheory.ModLib.GUI
         /// </summary>
         public event StateChangedDelegate VisibilityChanged;
 
+        public event GUIMouseEvent MouseDown;
+        public event GUIMouseEvent MouseUp;
+
+        protected static int GroupDepth = 0;
+
+
+        internal AbstractMod _drawingMod = null;
+
+        internal virtual void __Draw()
+        {
+            List<UnityEngine.GUILayoutOption> _Options = new List<UnityEngine.GUILayoutOption>();
+
+            if (MinWidth.HasValue)
+                _Options.Add(UnityEngine.GUILayout.MinWidth(MinWidth.Value));
+
+            if (MaxWidth.HasValue)
+                _Options.Add(UnityEngine.GUILayout.MaxWidth(MaxWidth.Value));
+
+            if (MinHeight.HasValue)
+                _Options.Add(UnityEngine.GUILayout.MinHeight(MinHeight.Value));
+
+            if (MaxHeight.HasValue)
+                _Options.Add(UnityEngine.GUILayout.MaxHeight(MaxHeight.Value));
+
+            this.Options = _Options.ToArray();
+
+            this.Draw();
+
+            try
+            {
+                if (UnityEngine.Event.current.type == UnityEngine.EventType.Repaint && !(this is IGroupItem))
+                    _ItemRect = UnityEngine.GUILayoutUtility.GetLastRect();
+
+                if(_ItemRect.HasValue && UnityEngine.Event.current.isMouse)
+                {
+                    if (UnityEngine.Event.current.type == UnityEngine.EventType.MouseDown)
+                    {
+                        if(_ItemRect.Value.Contains(UnityEngine.Event.current.mousePosition))
+                            MouseDown?.Invoke(this, UnityEngine.Event.current.button, UnityEngine.Event.current.mousePosition);
+                    }
+                    else if(UnityEngine.Event.current.type == UnityEngine.EventType.MouseUp)
+                    {
+                        if (_ItemRect.Value.Contains(UnityEngine.Event.current.mousePosition))
+                            MouseUp?.Invoke(this, UnityEngine.Event.current.button, UnityEngine.Event.current.mousePosition);
+                    }
+
+                }
+
+            }
+            catch(Exception ex)
+            {
+                UnityEngine.Debug.Log("Unable to get rect of " + this.GetType().Name + ": " + ex.Message);
+            }
+        }
+
         /// <summary>
         /// The method that actually draws the element on the screen.
         /// </summary>
-        internal abstract void Draw();
+        public abstract void Draw();
 
         public enum Direction
         {
@@ -70,4 +140,6 @@ namespace StarshipTheory.ModLib.GUI
             Vertical = 2
         }
     }
+
+    public delegate void GUIMouseEvent(GUIItem item, int button, UnityEngine.Vector2 position);
 }
