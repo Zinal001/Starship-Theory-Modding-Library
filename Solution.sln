@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarshipTheory.PatchInjecto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarshipTheory.ModLib", "StarshipTheory.ModLib\StarshipTheory.ModLib.csproj", "{94680F16-F033-45C9-A3CC-C4ED8C187DF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CostTweaking.Mod", "Examples\CostTweaking.Mod\CostTweaking.Mod.csproj", "{3B871133-CDD3-47C8-8911-586598547046}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{94680F16-F033-45C9-A3CC-C4ED8C187DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94680F16-F033-45C9-A3CC-C4ED8C187DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94680F16-F033-45C9-A3CC-C4ED8C187DF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3B871133-CDD3-47C8-8911-586598547046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3B871133-CDD3-47C8-8911-586598547046}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3B871133-CDD3-47C8-8911-586598547046}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3B871133-CDD3-47C8-8911-586598547046}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

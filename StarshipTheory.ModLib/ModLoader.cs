@@ -35,10 +35,7 @@ namespace StarshipTheory.ModLib
         {
             _Mods = new List<AbstractMod>();
 
-            _ModListButtonArea = new GUI.Area(new UnityEngine.Rect(UnityEngine.Screen.width - 100, 0, 100, UnityEngine.Screen.height)) { MaxWidth = 200, MaxHeight = 400 };
-            _ToggleModListBtn = new GUI.Button("Mods");
-            _ToggleModListBtn.Clicked += ToggleModListBtn_Clicked;
-            _ModListButtonArea.Items.Add(_ToggleModListBtn);
+            SetupGUI();
 
             String ModsFolder = null;
             if (UnityEngine.Application.platform == UnityEngine.RuntimePlatform.WindowsPlayer)
@@ -56,7 +53,6 @@ namespace StarshipTheory.ModLib
             
             RegisterMods(ModsFolder);
 
-
             foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
             {
                 try
@@ -66,7 +62,6 @@ namespace StarshipTheory.ModLib
                 }
                 catch(Exception ex)
                 {
-                    //TODO: Show Mod error window
                     ShowError(M, ex, "Initialization");
                     UnityEngine.Debug.LogError(ex);
                 }
@@ -74,6 +69,21 @@ namespace StarshipTheory.ModLib
 
         }
 
+        /// <summary>
+        /// Setup the Mods-GUI list on the main menu
+        /// </summary>
+        private void SetupGUI()
+        {
+            _ModListButtonArea = new GUI.Area(new UnityEngine.Rect(UnityEngine.Screen.width - 100, 0, 100, UnityEngine.Screen.height)) { MaxWidth = 200, MaxHeight = 400 };
+            _ToggleModListBtn = new GUI.Button("Mods");
+            _ToggleModListBtn.Clicked += ToggleModListBtn_Clicked;
+            _ModListButtonArea.Items.Add(_ToggleModListBtn);
+        }
+
+        /// <summary>
+        /// Register every .Mod.dll file in the Mods directory
+        /// </summary>
+        /// <param name="ModsFolder"></param>
         private void RegisterMods(String ModsFolder)
         {
             Type AbstractModType = typeof(AbstractMod);
@@ -221,29 +231,6 @@ namespace StarshipTheory.ModLib
 
                 _ModListButtonArea.__Draw();
             }
-
-            /*foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-            {
-                try
-                {
-                    if (!M._FirstGuiPassCalled)
-                    {                            
-                        M.FirstGUIPass();
-                        M._FirstGuiPassCalled = true;
-                    }
-
-                    if (ManagerMenu.mainMenuActive && M.CanShowModWindow)
-                        M.ModWindow.__Draw();
-
-                    M.OnGUI();
-                }
-                catch(Exception ex)
-                {
-                    //TODO: Show Mod error window
-                    ShowError(M, ex, "GUI");
-                    UnityEngine.Debug.LogError(ex);
-                }
-            }*/
         }
 
         private void CloseDebugBtn_Clicked(GUI.GUIItem item)
@@ -254,15 +241,19 @@ namespace StarshipTheory.ModLib
         private void ModBtn_Clicked(GUI.GUIItem item)
         {
             AbstractMod M = item.Tag as AbstractMod;
+#if DEBUG
             UnityEngine.Debug.Log("Toggleing window for " + M.ModName);
+#endif
             M.ToggleModWindow();
         }
 
         private void ToggleModListBtn_Clicked(GUI.GUIItem item)
         {
             _ShowModList = !_ShowModList;
+#if DEBUG
             UnityEngine.Debug.Log("Showing Mods: " + (_ShowModList ? "True" : "False"));
-            if(_ShowModList)
+#endif
+            if (_ShowModList)
             {
                 float MaxWidth = 0;
                 foreach (GUI.Button modbtn in _ModListButtonArea.Items)
@@ -283,7 +274,9 @@ namespace StarshipTheory.ModLib
                 }
 
                 _ModListButtonArea.Size = new UnityEngine.Rect((float)UnityEngine.Screen.width - MaxWidth, 0, MaxWidth, (float)UnityEngine.Screen.height);
+#if DEBUG
                 UnityEngine.Debug.Log("ModListArea: (" + _ModListButtonArea.Size.x + ", " + _ModListButtonArea.Size.y + ", " + _ModListButtonArea.Size.width + ", " + _ModListButtonArea.Size.height);
+#endif
             }
             else
             {
@@ -302,7 +295,6 @@ namespace StarshipTheory.ModLib
 
         internal void ShowError(String modName, String modVersion, Exception error, String where = "")
         {
-            UnityEngine.Debug.Log("Showing Error");
             _debugWindow.Title = "Error - " + modName + (!String.IsNullOrEmpty(modVersion) ? (" (" + modVersion + ")") : "");
             GUI.TextArea log = (GUI.TextArea)_debugWindow.Items.First();
 
