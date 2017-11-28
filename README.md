@@ -20,6 +20,6 @@ Download and extract the [latest release](https://github.com/Zinal001/Starship-T
 #### Examples
 A few example mods.
 
-*Compiled versions of these mods can be found [Here](https://github.com/Zinal001/Starship-Theory-Modding-Library/tree/master/Releases/Mods)
+*Compiled versions of these mods can be found [Here](https://github.com/Zinal001/Starship-Theory-Modding-Library/tree/master/Releases/Mods)*
 
 ![Modded Version](https://github.com/Zinal001/Starship-Theory-Modding-Library/blob/master/Images/Modded.png)
