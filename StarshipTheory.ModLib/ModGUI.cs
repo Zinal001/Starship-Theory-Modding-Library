@@ -11,6 +11,8 @@ namespace StarshipTheory.ModLib
 
         private static int _WindowIndex = -1;
 
+        private bool _FirstPass = false;
+
         /// <summary>
         /// Returns a new index for GUI.Window's
         /// <see>https://docs.unity3d.com/Manual/gui-Controls.html#Window</see>
@@ -22,7 +24,13 @@ namespace StarshipTheory.ModLib
             return _WindowIndex;
         }
 
-        private int tick = 0;
+        private static long _tick = 0;
+
+        public static long Tick
+        {
+            get { return _tick; }
+            private set { _tick = value; }
+        }
 
 
         /// <summary>
@@ -45,17 +53,42 @@ namespace StarshipTheory.ModLib
         /// </summary>
         void OnGUI()
         {
-            if (tick > 10000)
-                tick = 0;
+            if (_tick > 100000)
+                _tick = 0;
 
             if (_DefaultSkin == null)
                 _DefaultSkin = UnityEngine.GUI.skin;
 
-            if (tick % 10 == 0)
+            if (_tick % 10 == 0)
                 UnityEngine.GUI.skin = _DefaultSkin;
 
             ModLoader.Instance.__OnGui();
-            tick++;
+            _tick++;
+
+            foreach (AbstractMod M in ModLoader.Instance.Mods.Where(m => m.Enabled))
+            {
+                try
+                {
+                    if (!M._FirstGuiPassCalled)
+                    {
+                        M.FirstGUIPass();
+                        M._FirstGuiPassCalled = true;
+                    }
+
+                    if (ManagerMenu.mainMenuActive && M.CanShowModWindow)
+                        M.ModWindow.__Draw();
+
+                    M.OnGUI();
+                }
+                catch (Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    ModLoader.Instance.ShowError(M, ex, "GUI");
+                    UnityEngine.Debug.LogError(ex);
+                }
+            }
+
+
         }
     }
 }

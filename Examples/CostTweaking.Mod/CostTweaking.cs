@@ -17,6 +17,8 @@ namespace CostTweaking.Mod
 
         public override Version ModVersion => new Version("1.0.0");
 
+        public override string ModDescription => "Allows tweaking the costs of all objects in the game.";
+
         private Dictionary<String, List<TextField>> _fields = new Dictionary<string, List<TextField>>();
 
         public override void OnInitialize()

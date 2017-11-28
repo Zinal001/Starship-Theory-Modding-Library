@@ -21,9 +21,14 @@ namespace StarshipTheory.ModLib
         public abstract Version ModVersion { get; }
 
         /// <summary>
+        /// A description of what the mod does
+        /// </summary>
+        public virtual String ModDescription { get; }
+
+        /// <summary>
         /// Whenever this mod is enabled or not (Defaults to true)
         /// </summary>
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 
         /// <summary>
         /// The full path to the directory the .dll file is in
@@ -36,12 +41,12 @@ namespace StarshipTheory.ModLib
         public GUI.Window ModWindow { get; internal set; }
 
         /// <summary>
-        /// Can the GUI Window for this mod be shown?
+        /// <para>Can the GUI Window for this mod be shown?</para>
+        /// <para>Defaults to true</para>
         /// </summary>
         public bool CanShowModWindow { get; set; } = true;
 
         internal bool _FirstGuiPassCalled = false;
-
 
         public AbstractMod()
         {

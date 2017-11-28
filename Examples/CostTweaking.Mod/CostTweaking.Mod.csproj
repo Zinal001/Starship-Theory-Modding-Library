@@ -42,10 +42,6 @@
       <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="StarshipTheory.ModLib">
-      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\StarshipTheory.ModLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -65,6 +61,13 @@
   <ItemGroup>
     <Compile Include="CostTweaking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\StarshipTheory.ModLib\StarshipTheory.ModLib.csproj">
+      <Project>{94680f16-f033-45c9-a3cc-c4ed8c187df8}</Project>
+      <Name>StarshipTheory.ModLib</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -46,26 +46,47 @@ namespace StarshipTheory.ModLib
                 ModsFolder = System.IO.Path.Combine(UnityEngine.Application.dataPath, "..");
                 ModsFolder = System.IO.Path.Combine(ModsFolder, "Mods");
             }
+            //TODO: Support Mac/Linux platform
 
             if (String.IsNullOrEmpty(ModsFolder))
                 ModsFolder = "Mods";
 
             if (!System.IO.Directory.Exists(ModsFolder))
-            {
                 System.IO.Directory.CreateDirectory(ModsFolder);
+            
+            RegisterMods(ModsFolder);
+
+
+            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
+            {
+                try
+                {
+                    M.OnInitialize();
+                    UnityEngine.Debug.Log("Initialized " + M.ModName + " - " + M.ModVersion.ToString());
+                }
+                catch(Exception ex)
+                {
+                    //TODO: Show Mod error window
+                    ShowError(M, ex, "Initialization");
+                    UnityEngine.Debug.LogError(ex);
+                }
             }
 
+        }
+
+        private void RegisterMods(String ModsFolder)
+        {
             Type AbstractModType = typeof(AbstractMod);
 
             System.IO.DirectoryInfo ModsFolderInfo = new System.IO.DirectoryInfo(ModsFolder);
 
-            foreach(System.IO.FileInfo DllFile in ModsFolderInfo.GetFiles("*.Mod.dll", System.IO.SearchOption.AllDirectories))
+            foreach (System.IO.FileInfo DllFile in ModsFolderInfo.GetFiles("*.Mod.dll", System.IO.SearchOption.AllDirectories))
             {
                 try
                 {
                     System.Reflection.Assembly ModAssembly = System.Reflection.Assembly.LoadFile(DllFile.FullName);
                     bool ModTypeFound = false;
-                    foreach(Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && !t.IsInterface && !t.IsAbstract))
+                    foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && !t.IsInterface && !t.IsAbstract))
                     {
                         AbstractMod M = (AbstractMod)Activator.CreateInstance(T);
                         if (M != null)
@@ -79,7 +100,7 @@ namespace StarshipTheory.ModLib
                                 MinWidth = 200,
                                 MaxWidth = UnityEngine.Screen.width,
                                 MinHeight = 20,
-                                MaxHeight =  UnityEngine.Screen.height
+                                MaxHeight = UnityEngine.Screen.height
                             };
 
                             M.ModFolder = DllFile.Directory.FullName;
@@ -97,29 +118,12 @@ namespace StarshipTheory.ModLib
                     if (!ModTypeFound)
                         UnityEngine.Debug.LogWarning("No mod found in file " + DllFile.Name + " but it's designated as a mod");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ShowError(DllFile.Name.Replace(".Mod.dll", ""), "", ex, "Load");
                     UnityEngine.Debug.LogError("Failed to initialize mod from file " + DllFile.Name + ": " + ex.Message);
                 }
             }
-
-            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-            {
-                try
-                {
-
-                    M.OnInitialize();
-                    UnityEngine.Debug.Log("Initialized " + M.ModName + " - " + M.ModVersion.ToString());
-                }
-                catch(Exception ex)
-                {
-                    //TODO: Show Mod error window
-                    ShowError(M, ex, "Initialization");
-                    UnityEngine.Debug.LogError(ex);
-                }
-            }
-
         }
 
         /// <summary>
@@ -218,7 +222,7 @@ namespace StarshipTheory.ModLib
                 _ModListButtonArea.__Draw();
             }
 
-            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
+            /*foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
             {
                 try
                 {
@@ -239,7 +243,7 @@ namespace StarshipTheory.ModLib
                     ShowError(M, ex, "GUI");
                     UnityEngine.Debug.LogError(ex);
                 }
-            }
+            }*/
         }
 
         private void CloseDebugBtn_Clicked(GUI.GUIItem item)
