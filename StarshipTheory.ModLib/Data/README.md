@@ -49,5 +49,5 @@ Each ES2Type class can read and write data stored in a save file.
 - TileInfo
 - AudioClip
 - StarInfo
-## In addition, the Modding Library also includes the following classes:
+### In addition, the Modding Library also includes the following classes:
 - EntityCost
