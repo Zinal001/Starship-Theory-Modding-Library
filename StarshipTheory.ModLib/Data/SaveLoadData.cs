@@ -5,6 +5,9 @@ using System.Text;
 
 namespace StarshipTheory.ModLib.Data
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class SaveLoadData
     {
         private static List<ES2Type> _Types;
@@ -32,7 +35,10 @@ namespace StarshipTheory.ModLib.Data
             _Types.Add(type);
         }
 
-        public static void Init()
+        /// <summary>
+        /// <para>DO NOT CALL THIS FUNCTION DIRECTLY</para>
+        /// </summary>
+        public static void __Init()
         {
             if (ES2TypeManager.types == null)
                 ES2TypeManager.types = new Dictionary<Type, ES2Type>();

@@ -14,7 +14,7 @@ namespace StarshipTheory.PatchInjector.Patches
         public override void Inject()
         {
             TypeDefinition saveLoadDataType = ModLibModule.GetTypeByName("SaveLoadData");
-            MethodDefinition saveLoadInitMethod = saveLoadDataType.GetMethodByName("Init");
+            MethodDefinition saveLoadInitMethod = saveLoadDataType.GetMethodByName("__Init");
 
             TypeDefinition ES2InitType = GameModule.GetTypeByName("ES2Init");
             MethodDefinition ES2InitMethod = ES2InitType.GetMethodByName("Init");
