@@ -25,7 +25,7 @@ namespace StarshipTheory.PatchInjector
 
         public void CreateSetterGetterFor(FieldDefinition field, TypeDefinition ownerType, bool isStaticField = false)
         {
-            MethodDefinition set_method = new MethodDefinition("Set_" + field.Name, MethodAttributes.Public, NullType);
+            MethodDefinition set_method = new MethodDefinition("_ModSet_" + field.Name, MethodAttributes.Public, NullType);
             set_method.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, field.FieldType));
 
             set_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
@@ -38,7 +38,7 @@ namespace StarshipTheory.PatchInjector
 
             ownerType.Methods.Add(set_method);
 
-            MethodDefinition get_method = new MethodDefinition("Get_" + field.Name, MethodAttributes.Public, field.FieldType);
+            MethodDefinition get_method = new MethodDefinition("_ModGet_" + field.Name, MethodAttributes.Public, field.FieldType);
 
             get_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
             if(isStaticField)
