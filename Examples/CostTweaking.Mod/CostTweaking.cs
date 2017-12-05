@@ -105,7 +105,8 @@ namespace CostTweaking.Mod
                 if(txt != null)
                 {
                     String resource = txt.Tag as String;
-                    if (int.TryParse(txt.Text, out int val))
+                    int val;
+                    if (int.TryParse(txt.Text, out val))
                     {
                         Debug.Log("Setting " + resource + " of " + cost_name + " to " + val);
                         cost.SetCost(resource, val);

@@ -32,11 +32,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ES2">
-      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
+      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
     </Reference>
     <Reference Include="StarshipTheory.ModLib">
       <HintPath>..\..\StarshipTheory.ModLib\bin\Debug\StarshipTheory.ModLib.dll</HintPath>
@@ -48,11 +48,11 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -62,6 +62,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "Debug.Mod.dll" "F:\Games\Steam\steamapps\common\Starship Theory\Mods\Debug.Mod.dll"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

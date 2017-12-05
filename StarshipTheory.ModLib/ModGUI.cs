@@ -11,8 +11,6 @@ namespace StarshipTheory.ModLib
 
         private static int _WindowIndex = -1;
 
-        private bool _FirstPass = false;
-
         /// <summary>
         /// Returns a new index for GUI.Window's
         /// <see>https://docs.unity3d.com/Manual/gui-Controls.html#Window</see>

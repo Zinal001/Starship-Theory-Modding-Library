@@ -41,7 +41,40 @@ namespace ExporterImporter.Mod
 
         private void ImportBtn_Clicked(GUI.GUIItem item)
         {
+            if (_GameStarted && _Manager != null)
+            {
+                MouseUI mouseUI = _Manager.GetComponent<MouseUI>();
 
+                Tiles shipTiles = mouseUI._ModGet_TileMap().GetComponent<Tiles>();
+                Structures structures = mouseUI._ModGet_TileMap().GetComponent<Structures>();
+
+                if(shipTiles != null && structures != null)
+                {
+                    List<TileData> tiles = new List<TileData>();
+                    using (System.IO.StreamReader sr = new System.IO.StreamReader("Export.txt", Encoding.UTF8))
+                    {
+                        while(!sr.EndOfStream)
+                        {
+                            TileData td = TileData.ReadFrom(sr);
+                            if (td != null)
+                                tiles.Add(td);
+                        }
+                    }
+
+                    shipTiles.setUpDataStructure();
+
+                    foreach(TileData td in tiles)
+                    {
+                        shipTiles.tiles[(int)td.X, (int)td.Y].tileType = td.Type;
+                        shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = td.To_Become;
+
+                        foreach(TileData.StructData sd in td.StructDatas)
+                            shipTiles.tiles[(int)td.X, (int)td.Y].structureParts.Add(new Vector3(sd.X, sd.Y, sd.Rotation));
+                    }
+
+                }
+
+            }
         }
 
         private void ExportBtn_Clicked(GUI.GUIItem item)
@@ -52,9 +85,9 @@ namespace ExporterImporter.Mod
 
                 Tiles shipTiles = mouseUI._ModGet_TileMap().GetComponent<Tiles>();
                 Structures structures = mouseUI._ModGet_TileMap().GetComponent<Structures>();
-                if (shipTiles != null)
+                if (shipTiles != null && structures != null)
                 {
-                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter("Export.txt", false, Encoding.UTF8))
+                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter("Design.txt", false, Encoding.UTF8))
                     {
                         for (int x = shipTiles.tiles.GetLowerBound(0); x <= shipTiles.tiles.GetUpperBound(0); x++)
                         {
@@ -63,22 +96,15 @@ namespace ExporterImporter.Mod
                                 if (String.IsNullOrEmpty(shipTiles.tiles[x, y].tileType) && String.IsNullOrEmpty(shipTiles.tiles[x, y].toBecome))
                                     continue;
 
-                                //Format: X Y TYPE TO_BECOME NUM_STRUCTURE_PARTS
-                                sw.WriteLine(String.Format("TILE {0} {1} {2} {3} {4}", x, y, shipTiles.tiles[x, y].tileType, shipTiles.tiles[x, y].toBecome, shipTiles.tiles[x, y].structureParts.Count));
+                                TileData td = new TileData(x, y, shipTiles.tiles[x, y].tileType, shipTiles.tiles[x, y].toBecome);
 
-                                if(shipTiles.tiles[x, y].structureParts.Count > 0)
-                                {
-                                    //Format: X Y Rotation
-                                    for (int sIndex = 0; sIndex < shipTiles.tiles[x, y].structureParts.Count; sIndex++)
-                                        sw.WriteLine(String.Format("DATA {0} {1} {2}", shipTiles.tiles[x, y].structureParts[sIndex].x, shipTiles.tiles[x, y].structureParts[sIndex].y, shipTiles.tiles[x, y].structureParts[sIndex].z));
+                                for (int sIndex = 0; sIndex < shipTiles.tiles[x, y].structureParts.Count; sIndex++)
+                                    td.StructDatas.Add(new TileData.StructData(shipTiles.tiles[x, y].structureParts[sIndex].x, shipTiles.tiles[x, y].structureParts[sIndex].y, shipTiles.tiles[x, y].structureParts[sIndex].z));
 
-                                    if(structures != null)
-                                    {
-                                        foreach (String structStr in GetStructuresAt(structures, (float)x, (float)y))
-                                            sw.WriteLine(structStr);
-                                    }
 
-                                }
+                                td.Structures.AddRange(GetStructuresAt2(structures, x, y));
+                                
+                                td.WriteTo(sw);
                             }
                         }
                     }
@@ -91,16 +117,40 @@ namespace ExporterImporter.Mod
             
         }
 
+        private static readonly List<String> IgnoreExportingStructures = new List<string>() { "SCrate", "MCrate", "LCrate", "Floor", "Hull", "HullCorner" };
+
         private List<String> GetStructuresAt(Structures structures, float x, float y)
         {
             List<String> structs = new List<String>();
             foreach (StarshipTheory.ModLib.Resources.EntityCost cost in StarshipTheory.ModLib.Resources.Costs.GetEntityCosts())
             {
+                if (IgnoreExportingStructures.Contains(cost.Internal_Name))
+                    continue;
+
                 foreach (Vector2 pos in structures.allStructuresOfType(cost.Internal_Name))
                 {
                     //Format: X Y STRUCTURE_NAME
                     if(pos.x == x && pos.y == y)
                         structs.Add(String.Format("STRUCT {0} {1} {2}", pos.x, pos.y, cost.Internal_Name));
+                }
+            }
+
+            return structs;
+        }
+
+        private List<StructureData> GetStructuresAt2(Structures structures, float x, float y)
+        {
+            List<StructureData> structs = new List<StructureData>();
+            foreach (StarshipTheory.ModLib.Resources.EntityCost cost in StarshipTheory.ModLib.Resources.Costs.GetEntityCosts())
+            {
+                /*if (IgnoreExportingStructures.Contains(cost.Internal_Name))
+                    continue;*/
+
+                foreach (Vector2 pos in structures.allStructuresOfType(cost.Internal_Name))
+                {
+                    //Format: X Y STRUCTURE_NAME
+                    if (pos.x == x && pos.y == y)
+                        structs.Add(new StructureData(pos.x, pos.y, cost.Internal_Name));
                 }
             }
 

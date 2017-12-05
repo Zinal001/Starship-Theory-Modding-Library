@@ -49,7 +49,6 @@ namespace StarshipTheory.ModLib.GUI
         public bool IsResizeable { get; set; }
 
         private Vector2? _ResizeStart = null;
-        private bool _IsResizing = false;
 
         private Area _WindowArea;
         private Group TitleGroup;
