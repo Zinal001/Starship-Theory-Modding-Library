@@ -3,9 +3,11 @@
 
 ### These files are required to be referenced to mod Starship Theory.
 
-The files listed below usually found in SST's installation directory under StarshipTheory_Data\Managed\.
+The files listed below is usually found in SST's installation directory under StarshipTheory_Data\Managed\.
 
-*Note: Do __not__ include these files when you export your mod!*
+*Note: The game should already have been patched by [Patch Injector](https://github.com/Zinal001/Starship-Theory-Modding-Library/tree/master/StarshipTheory.PatchInjector/StarshipTheory.PatchInjector) before referencing them.*
+
+*Do __not__ include these files when you export your mod!*
 * Assembly-CSharp.dll
 * Assembly-CSharp-firstpass.dll
 * ES2.dll
