@@ -32,14 +32,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\RequiredFiles\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ES2">
-      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\ES2.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\RequiredFiles\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="StarshipTheory.ModLib">
-      <HintPath>..\..\StarshipTheory.ModLib\bin\Debug\StarshipTheory.ModLib.dll</HintPath>
+    <Reference Include="ES2, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\RequiredFiles\ES2.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,17 +51,24 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\RequiredFiles\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\RequiredFiles\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\StarshipTheory.ModLib\StarshipTheory.ModLib.csproj">
+      <Project>{94680f16-f033-45c9-a3cc-c4ed8c187df8}</Project>
+      <Name>StarshipTheory.ModLib</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
