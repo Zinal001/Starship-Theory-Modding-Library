@@ -22,6 +22,8 @@ namespace StarshipTheory.ModLib
 
         private GUI.Window _debugWindow;
 
+        private List<ExceptionInfo> _errorBeforeLoad = new List<ExceptionInfo>();
+
         public ModLoader()
         {
             Instance = this;
@@ -96,7 +98,7 @@ namespace StarshipTheory.ModLib
                 {
                     System.Reflection.Assembly ModAssembly = System.Reflection.Assembly.LoadFile(DllFile.FullName);
                     bool ModTypeFound = false;
-                    foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && !t.IsInterface && !t.IsAbstract))
+                    foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && t.IsPublic && !t.IsInterface && !t.IsAbstract))
                     {
                         AbstractMod M = (AbstractMod)Activator.CreateInstance(T);
                         if (M != null)
@@ -218,6 +220,10 @@ namespace StarshipTheory.ModLib
                 closeDebugBtn.Clicked += CloseDebugBtn_Clicked;
                 _debugWindow.Items.Add(new GUI.FlexibleSpace());
                 _debugWindow.Items.Add(closeDebugBtn);
+
+                if(_errorBeforeLoad.Count > 0)
+                    ShowError(_errorBeforeLoad[0].modName, _errorBeforeLoad[0].modVersion, _errorBeforeLoad[0].error, _errorBeforeLoad[0].where);
+
             }
 
             _debugWindow.__Draw();
@@ -295,8 +301,11 @@ namespace StarshipTheory.ModLib
 
         internal void ShowError(String modName, String modVersion, Exception error, String where = "")
         {
-            _debugWindow.Title = "Error - " + modName + (!String.IsNullOrEmpty(modVersion) ? (" (" + modVersion + ")") : "");
-            GUI.TextArea log = (GUI.TextArea)_debugWindow.Items.First();
+            if (_debugWindow == null)
+            {
+                _errorBeforeLoad.Add(new ExceptionInfo() { modName = modName, modVersion = modVersion, error = error, where = where });
+                return;
+            }
 
             String msg = "<color=red>";
             if (!String.IsNullOrEmpty(where))
@@ -307,6 +316,9 @@ namespace StarshipTheory.ModLib
             msg += ExceptionToMessage(error);
 
             msg += "</color>";
+
+            _debugWindow.Title = "Error - " + modName + (!String.IsNullOrEmpty(modVersion) ? (" (" + modVersion + ")") : "");
+            GUI.TextArea log = (GUI.TextArea)_debugWindow.Items.First();
 
             log.Text = msg;
 
@@ -334,6 +346,28 @@ namespace StarshipTheory.ModLib
             if (!String.IsNullOrEmpty(ex.StackTrace))
                 str += indent + "<b>Stacktrace:</b> " + ex.StackTrace + "\n";
 
+            if(ex is TypeLoadException)
+                str += indent + "<b>Type Name:</b> " + ((TypeLoadException)ex).TypeName + "\n";
+            else if(ex is System.Reflection.ReflectionTypeLoadException)
+            {
+                System.Reflection.ReflectionTypeLoadException rex = (System.Reflection.ReflectionTypeLoadException)ex;
+
+                if (rex == null)
+                    str += indent + "<b><color=yellow>REFLECTION TYPE LOAD FAILED</color></b>";
+                else
+                {
+                    if (rex.LoaderExceptions != null && rex.LoaderExceptions.Length > 0)
+                    {
+                        str += indent + "<b>Loader exceptions:</b>\n";
+                        foreach (Exception subEx in rex.LoaderExceptions)
+                        {
+                            if(subEx != null)
+                                str += ExceptionToMessage(subEx, indentC + 1);
+                        }
+                    }
+                }
+            }
+
             if (ex.InnerException != null)
             {
                 str += indent + "<b>Inner Exception:</b>\n";
@@ -342,5 +376,14 @@ namespace StarshipTheory.ModLib
 
             return str;
         }
+
+        private class ExceptionInfo
+        {
+            public String modName { get; set; }
+            public String modVersion { get; set; }
+            public Exception error { get; set; }
+            public String where { get; set; }
+        }
+
     }
 }

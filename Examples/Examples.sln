@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debug.Mod", "Debug.Mod\Debug.Mod.csproj", "{CBF36880-3CBE-4467-B7F7-0A803C9EA344}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CostTweaking.Mod", "CostTweaking.Mod\CostTweaking.Mod.csproj", "{3B871133-CDD3-47C8-8911-586598547046}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExporterImporter.Mod", "ExporterImporter.Mod\ExporterImporter.Mod.csproj", "{B329FB3E-8771-455B-A4B4-192374453962}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3B871133-CDD3-47C8-8911-586598547046}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B871133-CDD3-47C8-8911-586598547046}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B871133-CDD3-47C8-8911-586598547046}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B329FB3E-8771-455B-A4B4-192374453962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B329FB3E-8771-455B-A4B4-192374453962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B329FB3E-8771-455B-A4B4-192374453962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B329FB3E-8771-455B-A4B4-192374453962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

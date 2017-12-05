@@ -62,6 +62,5 @@ namespace StarshipTheory.ModLib.Resources
             else if (lResource == "research")
                 this.Research = value;
         }
-
     }
 }

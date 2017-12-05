@@ -82,7 +82,7 @@ namespace CostTweaking.Mod
             Group costGroup = btn.Tag as Group;
             String cost_name = costGroup.Tag as String;
 
-            MouseUI mUI = _Manager.GetComponent<MouseUI>().Get_Manager().GetComponent<MouseUI>();
+            MouseUI mUI = _Manager.GetComponent<MouseUI>()._ModGet_Manager().GetComponent<MouseUI>();
 
             EntityCost cost = Costs.GetEntityCost(cost_name);
             foreach (GUIItem costItem in costGroup.Items)
@@ -123,8 +123,8 @@ namespace CostTweaking.Mod
                 mUI.updateBuildInfomation("ButtonBuild" + cost.Internal_Name);
 
             ManagerResources res = _Manager.GetComponent<ManagerResources>();
-            if (res != null && res.Get_TileMap() != null)
-                res.updateResourcePanel(res.Get_TileMap());
+            if (res != null && res._ModGet_TileMap() != null)
+                res.updateResourcePanel(res._ModGet_TileMap());
 
         }
 
@@ -135,7 +135,7 @@ namespace CostTweaking.Mod
 
         public override void OnGameLoad(int saveSlot)
         {
-            String path = _Manager.GetComponent<ManagerOptions>().Get_path() + "SaveData" + saveSlot.ToString();
+            String path = _Manager.GetComponent<ManagerOptions>()._ModGet_path() + "SaveData" + saveSlot.ToString();
             if (ES2.Exists(path))
             {
                 if(ES2.Exists(path + "?tag=CostTweaking_Costs"))
@@ -156,7 +156,7 @@ namespace CostTweaking.Mod
 
         public override void OnGameSave(int saveSlot)
         {
-            ES2.Save<EntityCost>(Costs.GetEntityCosts(), _Manager.GetComponent<ManagerOptions>().Get_path() + "SaveData" + saveSlot.ToString() + "?tag=CostTweaking_Costs");
+            ES2.Save<EntityCost>(Costs.GetEntityCosts(), _Manager.GetComponent<ManagerOptions>()._ModGet_path() + "SaveData" + saveSlot.ToString() + "?tag=CostTweaking_Costs");
         }
     }
 }
