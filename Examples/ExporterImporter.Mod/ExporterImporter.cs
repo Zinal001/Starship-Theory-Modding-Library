@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace ExporterImporter.Mod
 {
+    /// <summary>
+    /// W.I.P
+    /// </summary>
     public class ExporterImporter : AbstractMod
     {
         private GameObject _Manager;
@@ -29,21 +32,23 @@ namespace ExporterImporter.Mod
 
             if (System.IO.File.Exists(System.IO.Path.Combine(ModFolder, "BuildData.json")))
             {
-                BuildData[] buildData;
                 Debug.Log("Found BuildData.json file");
                 try
                 {
                     String json = System.IO.File.ReadAllText(System.IO.Path.Combine(ModFolder, "BuildData.json"));
-                    buildData = Newtonsoft.Json.JsonConvert.DeserializeObject<BuildData[]>(json);
+                    BuildData[] buildData = Pathfinding.Serialization.JsonFx.JsonReader.Deserialize<BuildData[]>(json);
 
                     foreach (BuildData bd in buildData)
+                    {
                         ExporterImporter.buildData[bd.Type] = bd;
+                        Debug.Log("Found " + bd.Type + " buil data");
+                    }
 
-                    Debug.Log("Loaded " + buildData.Length + " build data.");
+                    Debug.Log("Found " + ExporterImporter.buildData.Count + " build data");
                 }
                 catch(Exception ex)
                 {
-                    Debug.Log("Failed to load BuildData.json file: " + ex.Message);
+                    Debug.Log("Failed to load BuildData.txt file: " + ex.Message);
                 }
             }
 
@@ -75,6 +80,7 @@ namespace ExporterImporter.Mod
                 Structures structures = tileMap.GetComponent<Structures>();
                 ManagerJobs managerJobs = _Manager.GetComponent<ManagerJobs>();
                 ManagerMenu managerMenu = _Manager.GetComponent<ManagerMenu>();
+                ManagerOptions managerOptions = _Manager.GetComponent<ManagerOptions>();
 
                 if(shipTiles != null && structures != null)
                 {
@@ -104,11 +110,17 @@ namespace ExporterImporter.Mod
                                 tiles.Add(new TileData(x, y, "ShipCore", ""));
                             else if(y == 50 && x == 55)
                                 tiles.Add(new TileData(x, y, "MiniEngine", ""));
-
                         }
                     }
 
-                    for(int x = shipTiles.tiles.GetLowerBound(0); x <= shipTiles.tiles.GetUpperBound(0); x++)
+                    bool deadCrewEndGame = true;
+                    if(managerOptions != null)
+                    {
+                        deadCrewEndGame = managerOptions.deadCrewEndGame;
+                        managerOptions.deadCrewEndGame = false;
+                    }
+
+                    for (int x = shipTiles.tiles.GetLowerBound(0); x <= shipTiles.tiles.GetUpperBound(0); x++)
                     {
                         for(int y = shipTiles.tiles.GetLowerBound(1); y <= shipTiles.tiles.GetUpperBound(1); y++)
                         {
@@ -117,128 +129,154 @@ namespace ExporterImporter.Mod
 
                             shipTiles.tiles[x, y].toBecome = "Remove";
                             managerJobs.completeJob(x, y, tileMap, false, false);
-
-                            /*structures.clearSpecificTile(x, y, true, false);
-                            shipTiles.clearTileGameObjects(x, y);*/
                         }
                     }
 
-                    foreach(TileData td in tiles)
-                    {
-                        shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = td.Type;
-                        if(buildData.ContainsKey(td.Type))
-                        {
-                            foreach(BuildData.Part part in buildData[td.Type].Parts)
-                            {
-                                float rX = td.X + part.RelativeX;
-                                float rY = td.Y + part.RelativeY;
-                                shipTiles.tiles[(int)rX, (int)rY].toBecome = td.Type;
-                                shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(new Vector3(rX, rY, buildData[td.Type].Rotation));
-                                managerJobs.completeJob((int)rX, (int)rY, tileMap, false, false);
-                            }
-                        }
+                    //Build queue: Hull, Floor, ShipCore, Structures
+                    List<TileData> hull = new List<TileData>();
+                    List<TileData> floor = new List<TileData>();
+                    TileData shipCore = null;
+                    List<TileData> other = new List<TileData>();
 
-                        managerJobs.completeJob((int)td.X, (int)td.Y, tileMap, false, false);
+                    foreach (TileData td in tiles)
+                    {
+                        if (td.Type == "Hull")
+                            hull.Add(td);
+                        else if (td.Type == "Floor")
+                            floor.Add(td);
+                        else if (td.Type == "ShipCore")
+                            shipCore = td;
+                        else
+                            other.Add(td);
                     }
 
-                    /*for(int x = 50; x <= 70; x++)
-                    {
-                        for(int y = 50; y <= 70; y++)
-                        {
-                            if (x == 50 || x == 70 || y == 50 || y == 70)
-                                shipTiles.tiles[x, y].toBecome = "Hull";
-                            else
-                                shipTiles.tiles[x, y].toBecome = "Floor";
+                    if(shipCore == null)
+                        throw new Exception("Ship Design is missing required tile ShipCore");
 
-                            managerJobs.completeJob(x, y, tileMap, false, false);
-
-                            if(y == 50)
-                            {
-                                if(x == 50)
-                                {
-                                    shipTiles.tiles[x, y].toBecome = "Airlock";
-                                    shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)y, 0f));
-                                    managerJobs.completeJob(x, y, tileMap, false, false);
-                                }
-                                else if (x == 51)
-                                {
-                                    shipTiles.tiles[x, y].toBecome = "CargoRack";
-                                    shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)y, 0f));
-                                    managerJobs.completeJob(x, y, tileMap, false, false);
-                                }
-                                else if (x == 52)
-                                {
-                                    shipTiles.tiles[x, y].toBecome = "SSolar";
-                                    shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)y, 0f));
-                                    managerJobs.completeJob(x, y, tileMap, false, false);
-                                }
-                                else if (x == 52)
-                                {
-                                    shipTiles.tiles[x, y].toBecome = "CPUPanel";
-                                    shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)y, 0f));
-                                    managerJobs.completeJob(x, y, tileMap, false, false);
-                                }
-                            }
-                            else if(y == 70 && x == 60)
-                            {
-                                shipTiles.tiles[x, y].toBecome = "MiniEngine";
-                                shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)y, 2f));
-                                shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)(y - 1), 2f));
-                                shipTiles.tiles[x, y].toBecome = "MiniEngine";
-                                shipTiles.tiles[x, y - 1].structureParts.Add(new Vector3((float)x, (float)y, 2f));
-                                shipTiles.tiles[x, y - 1].structureParts.Add(new Vector3((float)x, (float)(y - 1), 2f));
-                                managerJobs.completeJob(x, y, tileMap, false, false);
-                            }
-                            else if(x == 60 && y == 60)
-                            {
-                                shipTiles.tiles[x, y].toBecome = "ShipCore";
-                                shipTiles.tiles[x, y].structureParts.Add(new Vector3((float)x, (float)y, 0f));
-                                managerJobs.completeJob(x, y, tileMap, false, false);
-                            }
-
-                        }
-                    }*/
-
-                    shipTiles.updateTileColors();
-
-                    /*List<TileData> tiles = new List<TileData>();
-                    using (System.IO.StreamReader sr = new System.IO.StreamReader("Design.txt", Encoding.UTF8))
-                    {
-                        while(!sr.EndOfStream)
-                        {
-                            TileData td = TileData.ReadFrom(sr);
-                            if (td != null)
-                                tiles.Add(td);
-                        }
-                    }
-
-                    shipTiles.setUpDataStructure();
-                    structures.setupStructureLists();
-
-                    foreach(TileData td in tiles)
-                    {
-                        //shipTiles.tiles[(int)td.X, (int)td.Y].tileType = td.Type;
-                        shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = String.IsNullOrEmpty(td.Type) ? td.To_Become : td.Type;
-
-                        foreach(TileData.StructData sd in td.StructDatas)
-                            shipTiles.tiles[(int)td.X, (int)td.Y].structureParts.Add(new Vector3(sd.X, sd.Y, sd.Rotation));
-
-                        managerJobs.completeJob((int)td.X, (int)td.Y, tileMap, false, false);
-                    }
-
-                    _Manager.GetComponent<Default>().loadDefaultColors(tileMap);
-                    shipTiles.updateTileColors();
-                    structures.updateAllStructureTextures();
-                    shipTiles.updateTileMesh("All");
-                    structures.updateShieldHP(0f);
-                    structures.updateArmorMaxHP();
-                    structures.updateArmorHP(structures.baseArmorHP);
-                    structures.updateStructureMaxHP();
-                    structures.updateStructureHP(structures.returnBaseStructureHP());
-                    structures.updateStructureBoostText(0);*/
-
+                    shipTiles.StartCoroutine(UpdateTiles(shipTiles, managerJobs, managerOptions, tileMap, hull, floor, shipCore, other));
                 }
             }
+        }
+
+        private System.Collections.IEnumerator UpdateTiles(Tiles shipTiles, ManagerJobs managerJobs, ManagerOptions managerOptions, GameObject tileMap, List<TileData> hull, List<TileData> floor, TileData shipCore, List<TileData> other)
+        {
+            bool deadCrewEndGame = true;
+            if (managerOptions != null)
+            {
+                deadCrewEndGame = managerOptions.deadCrewEndGame;
+                managerOptions.deadCrewEndGame = false; //Make sure that the crew can't die while importing the ship.
+            }
+            yield return new WaitForFixedUpdate();
+
+            Structures structures = tileMap.GetComponent<Structures>();
+
+            Vector2[] tilesToRemove = new Vector2[structures.structure[0].allTilesList.Count];
+            structures.structure[0].allTilesList.CopyTo(tilesToRemove, 0);
+            
+            foreach (Vector2 pos in tilesToRemove)
+            {
+                if (String.IsNullOrEmpty(shipTiles.tiles[(int)pos.x, (int)pos.y].toBecome) && String.IsNullOrEmpty(shipTiles.tiles[(int)pos.x, (int)pos.y].tileType) && String.IsNullOrEmpty(shipTiles.tiles[(int)pos.x, (int)pos.y].structureType))
+                    continue;
+
+                shipTiles.tiles[(int)pos.x, (int)pos.y].toBecome = "Remove";
+                managerJobs.completeJob((int)pos.x, (int)pos.y, tileMap, false, false);
+            }
+            yield return new WaitForFixedUpdate();
+
+            /*for (int x = shipTiles.tiles.GetLowerBound(0); x <= shipTiles.tiles.GetUpperBound(0); x++)
+            {
+                for (int y = shipTiles.tiles.GetLowerBound(1); y <= shipTiles.tiles.GetUpperBound(1); y++)
+                {
+                    if (String.IsNullOrEmpty(shipTiles.tiles[x, y].toBecome) && String.IsNullOrEmpty(shipTiles.tiles[x, y].tileType) && String.IsNullOrEmpty(shipTiles.tiles[x, y].structureType))
+                        continue;
+
+                    shipTiles.tiles[x, y].toBecome = "Remove";
+                    managerJobs.completeJob(x, y, tileMap, false, false);
+                    yield return new WaitForFixedUpdate();
+                }
+            }*/
+
+
+            if (hull.Count > 0)
+            {
+                foreach (TileData td in hull)
+                {
+                    shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = td.Type;
+                    foreach (BuildData.Part part in buildData[td.Type].Parts)
+                    {
+                        float rX = td.X + part.RelativeX;
+                        float rY = td.Y + part.RelativeY;
+                        shipTiles.tiles[(int)rX, (int)rY].toBecome = td.Type;
+                        shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(new Vector3(rX, rY, buildData[td.Type].Rotation));
+                        managerJobs.completeJob((int)rX, (int)rY, tileMap, false, false);
+                    }
+
+                    managerJobs.completeJob((int)td.X, (int)td.Y, tileMap, false, false);
+                }
+            }
+            yield return new WaitForFixedUpdate();
+
+            if (floor.Count > 0)
+            {
+                foreach (TileData td in floor)
+                {
+                    shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = td.Type;
+                    foreach (BuildData.Part part in buildData[td.Type].Parts)
+                    {
+                        float rX = td.X + part.RelativeX;
+                        float rY = td.Y + part.RelativeY;
+                        shipTiles.tiles[(int)rX, (int)rY].toBecome = td.Type;
+                        shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(new Vector3(rX, rY, buildData[td.Type].Rotation));
+                        managerJobs.completeJob((int)rX, (int)rY, tileMap, false, false);
+                    }
+                    managerJobs.completeJob((int)td.X, (int)td.Y, tileMap, false, false);
+                    shipTiles.tiles[(int)td.X, (int)td.Y].leakValue = 0;
+                }
+            }
+            yield return new WaitForFixedUpdate();
+
+            shipTiles.tiles[(int)shipCore.X, (int)shipCore.Y].toBecome = shipCore.Type;
+            foreach (BuildData.Part part in buildData[shipCore.Type].Parts)
+            {
+                float rX = shipCore.X + part.RelativeX;
+                float rY = shipCore.Y + part.RelativeY;
+                shipTiles.tiles[(int)rX, (int)rY].toBecome = shipCore.Type;
+                shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(new Vector3(rX, rY, buildData[shipCore.Type].Rotation));
+                managerJobs.completeJob((int)rX, (int)rY, tileMap, false, false);
+            }
+
+            managerJobs.completeJob((int)shipCore.X, (int)shipCore.Y, tileMap, false, false);
+            yield return new WaitForFixedUpdate();
+
+            if (other.Count > 0)
+            {
+                foreach (TileData td in other)
+                {
+                    shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = td.Type;
+                    foreach (BuildData.Part part in buildData[td.Type].Parts)
+                    {
+                        float rX = td.X + part.RelativeX;
+                        float rY = td.Y + part.RelativeY;
+                        shipTiles.tiles[(int)rX, (int)rY].toBecome = td.Type;
+                        shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(new Vector3(rX, rY, buildData[td.Type].Rotation));
+                        managerJobs.completeJob((int)rX, (int)rY, tileMap, false, false);
+                    }
+                    managerJobs.completeJob((int)td.X, (int)td.Y, tileMap, false, false);
+                }
+            }
+            yield return new WaitForFixedUpdate();
+
+            shipTiles.updateTileColors();
+
+            Crew crew = tileMap.GetComponent<Crew>();
+            foreach (GameObject crewMember in crew.crewList)
+            {
+                crewMember.transform.position = new Vector3(shipCore.X, crewMember.transform.position.z, shipCore.Y);
+                crewMember.GetComponent<AI>().aiTask = "Idle";
+            }
+
+            if (managerOptions != null)
+                managerOptions.deadCrewEndGame = deadCrewEndGame;
         }
 
         private void ExportBtn_Clicked(GUI.GUIItem item)
@@ -259,8 +297,6 @@ namespace ExporterImporter.Mod
                             {
                                 if (String.IsNullOrEmpty(shipTiles.tiles[x, y].tileType) && String.IsNullOrEmpty(shipTiles.tiles[x, y].toBecome) && String.IsNullOrEmpty(shipTiles.tiles[x, y].structureType))
                                     continue;
-
-
 
                                 TileData td = new TileData(x, y, shipTiles.tiles[x, y].tileType, shipTiles.tiles[x, y].toBecome);
 
