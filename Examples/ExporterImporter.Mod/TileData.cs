@@ -11,7 +11,6 @@ namespace ExporterImporter.Mod
         public float X { get; set; }
         public float Y { get; set; }
         public String Type { get; set; }
-        public String To_Become { get; set; }
 
         public List<StructData> StructDatas { get; private set; }
 
@@ -23,24 +22,29 @@ namespace ExporterImporter.Mod
             this.Structures = new List<StructureData>();
         }
 
-        public TileData(float X, float Y, String Type, String To_Become) : this()
+        public TileData(float X, float Y, String Type) : this()
         {
             this.X = X;
             this.Y = Y;
             this.Type = Type;
-            this.To_Become = To_Become;
         }
 
 
         public void WriteTo(StreamWriter Writer)
         {
-            Writer.WriteLine(String.Format("{0} {1} {2} {3} {4} {5}", X, Y, Type, To_Become, StructDatas.Count, Structures.Count));
+            Writer.WriteLine(String.Format("{0} {1} {2} {3} {4} {5}", X, Y, Type, StructDatas.Count, Structures.Count));
 
-            for (int i = 0; i < StructDatas.Count; i++)
-                Writer.WriteLine(String.Format("{0} {1} {2}", StructDatas[i].X, StructDatas[i].Y, StructDatas[i].Rotation));
+            if(StructDatas.Count > 0)
+            {
+                for (int i = 0; i < StructDatas.Count; i++)
+                    Writer.WriteLine(String.Format("{0} {1} {2}", StructDatas[i].X, StructDatas[i].Y, StructDatas[i].Rotation));
+            }
 
-            for (int i = 0; i < Structures.Count; i++)
-                Writer.WriteLine(String.Format("{0} {1} {2}", Structures[i].X, Structures[i].Y, Structures[i].Type));
+            if(Structures.Count > 0)
+            {
+                for (int i = 0; i < Structures.Count; i++)
+                    Writer.WriteLine(String.Format("{0} {1} {2}", Structures[i].X, Structures[i].Y, Structures[i].Type));
+            }            
         }
 
         public static TileData ReadFrom(StreamReader Reader)
@@ -54,7 +58,6 @@ namespace ExporterImporter.Mod
                 Res.X = float.Parse(Parts[0]);
                 Res.Y = float.Parse(Parts[1]);
                 Res.Type = Parts[2];
-                Res.To_Become = Parts[3];
 
                 int numStructs = int.Parse(Parts[4]);
                 for(int i = 0; i < numStructs; i++)
