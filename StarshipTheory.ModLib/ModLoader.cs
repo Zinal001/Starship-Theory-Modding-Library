@@ -191,6 +191,8 @@ namespace StarshipTheory.ModLib
                 GUI.Button modBtn = new GUI.Button(M.Info.DisplayName) { Tag = M, Visible = false };
                 modBtn.Clicked += ModBtn_Clicked;
                 _ModListButtonArea.Items.Add(modBtn);
+
+                M.OnInitialize();
             }
         }
 
