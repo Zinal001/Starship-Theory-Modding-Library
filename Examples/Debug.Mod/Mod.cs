@@ -4,18 +4,8 @@ using UnityEngine;
 
 namespace Debug.Mod
 {
-    public class Mod : AbstractMod
+    public class Debug : StarshipTheory.ModLib.Mod
     {
-        /// <summary>
-        /// The display name of the mod
-        /// </summary>
-        public override string ModName => "Debug Mod";
-
-        /// <summary>
-        /// The current version of the mod
-        /// </summary>
-        public override Version ModVersion => new Version("1.0.0");
-
         private GameObject _Manager;
 
         private StarshipTheory.ModLib.GUI.Button _ToggleBtn;
@@ -35,7 +25,7 @@ namespace Debug.Mod
         /// <summary>
         /// FirstGUIPass is called whenever the gui of the mod window (or custom gui) should be created.
         /// </summary>
-        public override void FirstGUIPass()
+        public override void OnCreateGUI()
         {
             //Create a new GUI button
             _ToggleBtn = new StarshipTheory.ModLib.GUI.Button("Toggle Debug Mode");

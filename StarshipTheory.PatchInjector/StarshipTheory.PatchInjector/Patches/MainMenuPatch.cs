@@ -13,10 +13,10 @@ namespace StarshipTheory.PatchInjector.Patches
 
         public override void Inject()
         {
-            TypeDefinition ModLoaderDef = ModLibModule.GetTypeByName("ModLoader");
             TypeDefinition ManagerDef = GameModule.GetTypeByName("ManagerOptions");
             
             ChangeGameTitle();
+            NewPanelOpened();
         }
 
         private void ChangeGameTitle()
@@ -32,6 +32,25 @@ namespace StarshipTheory.PatchInjector.Patches
                     break;
                 }
             }
+        }
+
+        private void NewPanelOpened()
+        {
+            TypeDefinition MenuEventsDef = ModLibModule.GetTypeByName("MenuEvents");
+            MethodDefinition OnNewGamePanelOpened = MenuEventsDef.GetMethodByName("__OnNewGamePanelOpened");
+
+            TypeDefinition ManagerMenuDef = GameModule.GetTypeByName("ManagerMenu");
+            MethodDefinition Method = ManagerMenuDef.GetMethodByName("createNewGamePanel");
+
+            FieldDefinition rightMenuFieldDef = ManagerMenuDef.GetFieldByName("mainMenuRight");
+
+            Instruction[] instructions = new Instruction[] {
+                Instruction.Create(OpCodes.Ldarg_0),
+                Instruction.Create(OpCodes.Ldfld, GameModule.Import(rightMenuFieldDef)),
+                Instruction.Create(OpCodes.Callvirt, GameModule.Import(OnNewGamePanelOpened))
+            };
+
+            Method.Body.GetILProcessor().InjectInstructionsToEnd(instructions);
         }
     }
 }

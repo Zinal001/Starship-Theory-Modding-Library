@@ -80,7 +80,7 @@ namespace StarshipTheory.ModLib.GUI
         protected static int GroupDepth = 0;
 
 
-        internal AbstractMod _drawingMod = null;
+        internal Mod _drawingMod = null;
 
         internal virtual void __Draw()
         {

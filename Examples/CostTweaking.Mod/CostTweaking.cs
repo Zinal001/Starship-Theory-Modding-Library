@@ -6,27 +6,28 @@ using UnityEngine;
 using StarshipTheory.ModLib;
 using StarshipTheory.ModLib.Resources;
 using StarshipTheory.ModLib.GUI;
+using Events = StarshipTheory.ModLib.Events;
 
 namespace CostTweaking.Mod
 {
-    public class CostTweaking : AbstractMod
+    public class CostTweaking : StarshipTheory.ModLib.Mod
     {
         private GameObject _Manager;
 
-        public override string ModName => "Cost Tweaking";
-
-        public override Version ModVersion => new Version("1.0.0");
-
-        public override string ModDescription => "Allows tweaking the costs of all objects in the game.";
-
         private Dictionary<String, List<TextField>> _fields = new Dictionary<string, List<TextField>>();
+
+        public CostTweaking()
+        {
+            Events.GameEvents.GameLoaded += GameEvents_GameLoaded;
+            Events.GameEvents.GameSaved += GameEvents_GameSaved;
+        }
 
         public override void OnInitialize()
         {
             _Manager = GameObject.Find("Manager");
         }
 
-        public override void FirstGUIPass()
+        public override void OnCreateGUI()
         {
             String[] resources = new String[] { "Metal", "Gold", "Silicon", "CPU", "Power", "TileHP", "Water", "Research" };
 
@@ -134,18 +135,25 @@ namespace CostTweaking.Mod
             TextField textField = item as TextField;
         }
 
-        public override void OnGameLoad(int saveSlot)
+
+
+        private void GameEvents_GameSaved(object sender, Events.GameEvents.SaveLoadEventArgs e)
         {
-            String path = _Manager.GetComponent<ManagerOptions>()._ModGet_path() + "SaveData" + saveSlot.ToString();
+            ES2.Save<EntityCost>(Costs.GetEntityCosts(), e.savePath + "?tag=CostTweaking_Costs");
+        }
+
+        private void GameEvents_GameLoaded(object sender, Events.GameEvents.SaveLoadEventArgs e)
+        {
+            String path = e.savePath;
             if (ES2.Exists(path))
             {
-                if(ES2.Exists(path + "?tag=CostTweaking_Costs"))
+                if (ES2.Exists(path + "?tag=CostTweaking_Costs"))
                 {
                     EntityCost[] costsData = ES2.LoadArray<EntityCost>(path + "?tag=CostTweaking_Costs");
-                    foreach(EntityCost data in costsData)
+                    foreach (EntityCost data in costsData)
                     {
                         Costs.SetEntityCost(data);
-                        if(_fields.ContainsKey(data.Internal_Name))
+                        if (_fields.ContainsKey(data.Internal_Name))
                         {
                             foreach (TextField field in _fields[data.Internal_Name])
                                 field.Text = data.GetCost(field.Tag as String).ToString();
@@ -153,11 +161,6 @@ namespace CostTweaking.Mod
                     }
                 }
             }
-        }
-
-        public override void OnGameSave(int saveSlot)
-        {
-            ES2.Save<EntityCost>(Costs.GetEntityCosts(), _Manager.GetComponent<ManagerOptions>()._ModGet_path() + "SaveData" + saveSlot.ToString() + "?tag=CostTweaking_Costs");
         }
     }
 }

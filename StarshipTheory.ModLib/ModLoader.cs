@@ -9,9 +9,9 @@ namespace StarshipTheory.ModLib
     {
         internal static ModLoader Instance { get; private set; }
 
-        private List<AbstractMod> _Mods;
+        private List<Mod> _Mods;
 
-        public AbstractMod[] Mods
+        public Mod[] Mods
         {
             get { return _Mods.ToArray(); }
         }
@@ -35,7 +35,7 @@ namespace StarshipTheory.ModLib
         /// </summary>
         public void __LoadMods()
         {
-            _Mods = new List<AbstractMod>();
+            _Mods = new List<Mod>();
 
             SetupGUI();
 
@@ -55,12 +55,12 @@ namespace StarshipTheory.ModLib
             
             RegisterMods(ModsFolder);
 
-            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
+            foreach (Mod M in _Mods.Where(m => m.Enabled))
             {
                 try
                 {
                     M.OnInitialize();
-                    UnityEngine.Debug.Log("Initialized " + M.ModName + " - " + M.ModVersion.ToString());
+                    UnityEngine.Debug.Log("Initialized " + M.Info.Name + " - " + M.Info.Version.ToString());
                 }
                 catch(Exception ex)
                 {
@@ -88,11 +88,112 @@ namespace StarshipTheory.ModLib
         /// <param name="ModsFolder"></param>
         private void RegisterMods(String ModsFolder)
         {
-            Type AbstractModType = typeof(AbstractMod);
+            Type AbstractModType = typeof(Mod);
 
             System.IO.DirectoryInfo ModsFolderInfo = new System.IO.DirectoryInfo(ModsFolder);
 
-            foreach (System.IO.FileInfo DllFile in ModsFolderInfo.GetFiles("*.Mod.dll", System.IO.SearchOption.AllDirectories))
+            List<Mod> PreliminaryMods = new List<Mod>();
+
+            foreach(System.IO.DirectoryInfo modDir in ModsFolderInfo.GetDirectories("*", System.IO.SearchOption.TopDirectoryOnly))
+            {
+                if(System.IO.File.Exists(System.IO.Path.Combine(modDir.FullName, "Mod.json")))
+                {
+                    try
+                    {
+                        String modInfoJson = System.IO.File.ReadAllText(System.IO.Path.Combine(modDir.FullName, "Mod.json"));
+                        ModInfo modInfo = Pathfinding.Serialization.JsonFx.JsonReader.Deserialize<ModInfo>(modInfoJson);
+                        if (modInfo == null)
+                            throw new Exception("Invalid Mod.json file");
+
+                        try
+                        {
+                            String dllFile = System.IO.Path.Combine(modDir.FullName, modInfo.EntryDLL);
+                            if (String.IsNullOrEmpty(modInfo.EntryDLL) || !System.IO.File.Exists(dllFile))
+                                throw new System.IO.FileNotFoundException("Missing EntryDLL file");
+
+                            System.Reflection.Assembly ModAssembly = System.Reflection.Assembly.LoadFile(dllFile);
+                            bool ModTypeFound = false;
+                            foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && t.IsPublic && !t.IsInterface && !t.IsAbstract))
+                            {
+                                Mod M = (Mod)Activator.CreateInstance(T);
+                                if (M != null)
+                                {
+                                    M.Info = modInfo;
+                                    M.ModFolder = modDir.FullName;
+                                    PreliminaryMods.Add(M);
+                                    ModTypeFound = true;
+                                }
+                            }
+
+                            if (!ModTypeFound)
+                                UnityEngine.Debug.LogWarning("No mod found in file " + dllFile + " but it's designated as a mod");
+                        }
+                        catch(Exception innerEx)
+                        {
+                            ShowError(modInfo.Name, modInfo.Version.ToString(), innerEx, "Load");
+                            UnityEngine.Debug.LogError("Failed to initialize mod from folder " + modInfo.Name + ": " + innerEx.Message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowError(modDir.Name, "", ex, "Load");
+                        UnityEngine.Debug.LogError("Failed to initialize mod from folder " + modDir.Name + ": " + ex.Message);
+                    }
+                }
+            }
+
+            foreach(Mod M in PreliminaryMods)
+            {
+                foreach(ModDependency dep in M.Info.Dependencies)
+                {
+                    bool has = false;
+                    foreach (Mod N in PreliminaryMods)
+                    {
+                        if (!N.Enabled)
+                            continue;
+
+                        if(dep.Name == N.Info.Name)
+                        {
+                            has = true;
+                            if (dep.MinimumVersion != null && dep.MinimumVersion > N.Info.Version)
+                                has = false;
+                            else if (dep.MaximumVersion != null && dep.MaximumVersion < N.Info.Version)
+                                has = false;
+                        }
+                    }
+
+                    if (!has)
+                    {
+                        UnityEngine.Debug.LogWarning("Mod " + M.Info.Name + " is missing dependency " + dep.Name);
+                        M.Enabled = false;
+                        break;
+                    }
+                }
+
+                if (M.Enabled)
+                    _Mods.Add(M);
+            }
+
+            foreach (Mod M in _Mods)
+            {
+                M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.Info.DisplayName)
+                {
+                    Visible = false,
+                    IsDraggable = true,
+                    IsResizeable = true,
+                    _drawingMod = M,
+                    MinWidth = 200,
+                    MaxWidth = UnityEngine.Screen.width,
+                    MinHeight = 20,
+                    MaxHeight = UnityEngine.Screen.height
+                };
+
+                GUI.Button modBtn = new GUI.Button(M.Info.DisplayName) { Tag = M, Visible = false };
+                modBtn.Clicked += ModBtn_Clicked;
+                _ModListButtonArea.Items.Add(modBtn);
+            }
+
+            /*foreach (System.IO.FileInfo DllFile in ModsFolderInfo.GetFiles("*.Mod.dll", System.IO.SearchOption.AllDirectories))
             {
                 try
                 {
@@ -100,7 +201,7 @@ namespace StarshipTheory.ModLib
                     bool ModTypeFound = false;
                     foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && t.IsPublic && !t.IsInterface && !t.IsAbstract))
                     {
-                        AbstractMod M = (AbstractMod)Activator.CreateInstance(T);
+                        Mod M = (Mod)Activator.CreateInstance(T);
                         if (M != null)
                         {
                             M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.ModName)
@@ -135,70 +236,7 @@ namespace StarshipTheory.ModLib
                     ShowError(DllFile.Name.Replace(".Mod.dll", ""), "", ex, "Load");
                     UnityEngine.Debug.LogError("Failed to initialize mod from file " + DllFile.Name + ": " + ex.Message);
                 }
-            }
-        }
-
-        /// <summary>
-        /// <para>Called from within the game's code. Notifying all enabled mods that a new game was started</para>
-        /// <para>Do not call this manually</para>
-        /// </summary>
-        public void __OnGameStarted()
-        {
-            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-            {
-                try
-                {
-                    M.OnGameStarted();
-                }
-                catch(Exception ex)
-                {
-                    //TODO: Show Mod error window
-                    ShowError(M, ex, "Game Started");
-                    UnityEngine.Debug.LogError(ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// <para>Called from within the game's code. Notifying all enabled mods that a game was loaded from a save</para>
-        /// <para>Do not call this manually</para>
-        /// </summary>
-        public void __OnGameLoaded(int saveSlot)
-        {
-            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-            {
-                try
-                {
-                    M.OnGameLoad(saveSlot);
-                }
-                catch (Exception ex)
-                {
-                    //TODO: Show Mod error window
-                    ShowError(M, ex, "Game Loaded");
-                    UnityEngine.Debug.LogError(ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// <para>Called from within the game's code. Notifying all enabled mods that the game is being saved</para>
-        /// <para>Do not call this manually</para>
-        /// </summary>
-        public void __OnGameSaved(int saveSlot)
-        {
-            foreach (AbstractMod M in _Mods.Where(m => m.Enabled))
-            {
-                try
-                {
-                    M.OnGameSave(saveSlot);
-                }
-                catch (Exception ex)
-                {
-                    //TODO: Show Mod error window
-                    ShowError(M, ex, "Game Saved");
-                    UnityEngine.Debug.LogError(ex);
-                }
-            }
+            }*/
         }
 
         private bool _FirstPass = true;
@@ -246,9 +284,9 @@ namespace StarshipTheory.ModLib
 
         private void ModBtn_Clicked(GUI.GUIItem item)
         {
-            AbstractMod M = item.Tag as AbstractMod;
+            Mod M = item.Tag as Mod;
 #if DEBUG
-            UnityEngine.Debug.Log("Toggleing window for " + M.ModName);
+            UnityEngine.Debug.Log("Toggleing window for " + M.Info.DisplayName);
 #endif
             M.ToggleModWindow();
         }
@@ -294,9 +332,9 @@ namespace StarshipTheory.ModLib
             }
         }
 
-        internal void ShowError(AbstractMod m, Exception error, String where = "")
+        internal void ShowError(Mod m, Exception error, String where = "")
         {
-            ShowError(m.ModName, m.ModVersion.ToString(), error, where);
+            ShowError(m.Info.DisplayName, m.Info.Version.ToString(), error, where);
         }
 
         internal void ShowError(String modName, String modVersion, Exception error, String where = "")

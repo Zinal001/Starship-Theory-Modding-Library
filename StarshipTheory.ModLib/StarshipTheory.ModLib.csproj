@@ -42,9 +42,8 @@
       <HintPath>..\RequiredFiles\ES2.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="StarshipTheory.ModLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\RequiredFiles\StarshipTheory.ModLib.dll</HintPath>
+    <Reference Include="Pathfinding.JsonFx">
+      <HintPath>..\RequiredFiles\Pathfinding.JsonFx.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -59,9 +58,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractMod.cs" />
+    <Compile Include="Mod.cs" />
     <Compile Include="Data\ES2_UserType_CostSaveData.cs" />
     <Compile Include="Data\SaveLoadData.cs" />
+    <Compile Include="Events\GameEvents.cs" />
+    <Compile Include="Events\MenuEvents.cs" />
     <Compile Include="GUI\Area.cs" />
     <Compile Include="GUI\Box.cs" />
     <Compile Include="GUI\Button.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="GUI\Toolbar.cs" />
     <Compile Include="GUI\Window.cs" />
     <Compile Include="ModGUI.cs" />
+    <Compile Include="ModInfo.cs" />
     <Compile Include="ModLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Costs.cs" />

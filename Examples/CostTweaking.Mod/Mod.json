@@ -1,0 +1,9 @@
+﻿{
+  "Name": "CostTweaking",
+  "DisplayName": "Cost Tweaking",
+  "Version": "1.0.0",
+  "Description": "",
+  "Author": "Zinal",
+  "EntryDLL": "CostTweaking.Mod.dll",
+  "Dependencies": []
+}

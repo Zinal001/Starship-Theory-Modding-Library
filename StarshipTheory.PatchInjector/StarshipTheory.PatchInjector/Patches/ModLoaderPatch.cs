@@ -15,12 +15,13 @@ namespace StarshipTheory.PatchInjector.Patches
         {
             TypeDefinition ModLoaderDef = ModLibModule.GetTypeByName("ModLoader");
             TypeDefinition ManagerDef = GameModule.GetTypeByName("ManagerOptions");
+            TypeDefinition GameEventsDef = ModLibModule.GetTypeByName("GameEvents");
 
             InjectModLoaderField(ModLoaderDef, ManagerDef);
             InjectModLoaderLoadMods(ModLoaderDef, ManagerDef);
-            InjectModLoaderGameStarted(ModLoaderDef, ManagerDef);
-            InjectModLoaderGameLoaded(ModLoaderDef, ManagerDef);
-            InjectModLoaderGameSaved(ModLoaderDef, ManagerDef);
+            InjectModLoaderGameStarted(GameEventsDef, ManagerDef);
+            InjectModLoaderGameLoaded(GameEventsDef, ManagerDef);
+            InjectModLoaderGameSaved(GameEventsDef, ManagerDef);
         }
 
         private void InjectModLoaderField(TypeDefinition ModLoaderDef, TypeDefinition ManagerDef)
@@ -55,11 +56,9 @@ namespace StarshipTheory.PatchInjector.Patches
             ManagerStartMethod.Body.GetILProcessor().InjectInstructionsToEnd(Instructions);
         }
 
-        private void InjectModLoaderGameStarted(TypeDefinition modLoaderDef, TypeDefinition managerDef)
+        private void InjectModLoaderGameStarted(TypeDefinition gameEventsDef, TypeDefinition managerDef)
         {
-            FieldDefinition ModLoaderFieldDef = managerDef.GetFieldByName("ModLoader");
-            MethodDefinition ModLoaderOnGameStartedMethod = modLoaderDef.GetMethodByName("__OnGameStarted");
-            MethodDefinition ManagerExecuteLoadGameDefaultSettingsMethod = managerDef.GetMethodByName("executeLoadGameDefaultSettings");
+            MethodDefinition GameStartedMethod = gameEventsDef.GetMethodByName("__OnGameStarted");
             MethodDefinition ManagerLoadDefaultPlayerShipMethod = managerDef.GetMethodByName("loadDefaultPlayerShip");
 
             Instruction loadText = ManagerLoadDefaultPlayerShipMethod.Body.Instructions.Where(i => i.OpCode == OpCodes.Ldstr && i.Operand.ToString() == "loading default from script").FirstOrDefault();
@@ -68,38 +67,33 @@ namespace StarshipTheory.PatchInjector.Patches
             Instruction endText = beforeText.Operand as Instruction;
 
             List<Instruction> Instructions = new List<Instruction>() {
-                Instruction.Create(OpCodes.Ldsfld, GameModule.Import(ModLoaderFieldDef)),
-                Instruction.Create(OpCodes.Callvirt, GameModule.Import(ModLoaderOnGameStartedMethod))
+                Instruction.Create(OpCodes.Callvirt, GameModule.Import(GameStartedMethod))
             };
 
             ManagerLoadDefaultPlayerShipMethod.Body.GetILProcessor().InsertBefore(endText, Instructions);
         }
 
-        private void InjectModLoaderGameLoaded(TypeDefinition modLoaderDef, TypeDefinition managerDef)
+        private void InjectModLoaderGameLoaded(TypeDefinition gameEventsDef, TypeDefinition managerDef)
         {
-            FieldDefinition ModLoaderFieldDef = managerDef.GetFieldByName("ModLoader");
-            MethodDefinition ModLoaderOnGameLoadedMethod = modLoaderDef.GetMethodByName("__OnGameLoaded");
+            MethodDefinition GameLoadedMethod = gameEventsDef.GetMethodByName("__OnGameLoaded");
             MethodDefinition ManagerExecuteLoadGameFromSlotMethod = managerDef.GetMethodByName("loadGameFromSlot");
 
             List<Instruction> Instructions = new List<Instruction>() {
-                Instruction.Create(OpCodes.Ldsfld, GameModule.Import(ModLoaderFieldDef)),
                 Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, GameModule.Import(ModLoaderOnGameLoadedMethod))
+                Instruction.Create(OpCodes.Callvirt, GameModule.Import(GameLoadedMethod))
             };
 
             ManagerExecuteLoadGameFromSlotMethod.Body.GetILProcessor().InjectInstructionsToEnd(Instructions);
         }
 
-        private void InjectModLoaderGameSaved(TypeDefinition modLoaderDef, TypeDefinition managerDef)
+        private void InjectModLoaderGameSaved(TypeDefinition gameEventsDef, TypeDefinition managerDef)
         {
-            FieldDefinition ModLoaderFieldDef = managerDef.GetFieldByName("ModLoader");
-            MethodDefinition ModLoaderOnGameSavedMethod = modLoaderDef.GetMethodByName("__OnGameSaved");
+            MethodDefinition GameSavedMethod = gameEventsDef.GetMethodByName("__OnGameSaved");
             MethodDefinition ManagerSaveGameIntoSlotMethod = managerDef.GetMethodByName("saveGameIntoSlot");
 
             List<Instruction> Instructions = new List<Instruction>() {
-                Instruction.Create(OpCodes.Ldsfld, GameModule.Import(ModLoaderFieldDef)),
                 Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, GameModule.Import(ModLoaderOnGameSavedMethod))
+                Instruction.Create(OpCodes.Callvirt, GameModule.Import(GameSavedMethod))
             };
 
             ManagerSaveGameIntoSlotMethod.Body.GetILProcessor().InjectInstructionsToEnd(Instructions);

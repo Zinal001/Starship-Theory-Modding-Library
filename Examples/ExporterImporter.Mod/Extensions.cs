@@ -18,5 +18,12 @@ namespace ExporterImporter.Mod
             return coll;
         }
 
+        public static List<T> Copy<T>(IEnumerable<T> lst)
+        {
+            List<T> nLst = new List<T>();
+            nLst.AddRange(lst);
+            return nLst;
+        }
+
     }
 }
