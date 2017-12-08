@@ -43,7 +43,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Pathfinding.JsonFx">
-      <HintPath>F:\Games\Steam\steamapps\common\Starship Theory\StarshipTheory_Data\Managed\Pathfinding.JsonFx.dll</HintPath>
+      <HintPath>G:\Program Files (x86)\Steam\SteamApps\common\Starship Theory\StarshipTheory_Data\Managed\Pathfinding.JsonFx.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -63,7 +63,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildData.cs" />
     <Compile Include="ExporterImporter.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,11 +75,6 @@
       <Name>StarshipTheory.ModLib</Name>
       <Private>False</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BuildData.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

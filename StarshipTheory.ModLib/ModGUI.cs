@@ -80,13 +80,10 @@ namespace StarshipTheory.ModLib
                 }
                 catch (Exception ex)
                 {
-                    //TODO: Show Mod error window
                     ModLoader.Instance.ShowError(M, ex, "GUI");
                     UnityEngine.Debug.LogError(ex);
                 }
             }
-
-
         }
     }
 }

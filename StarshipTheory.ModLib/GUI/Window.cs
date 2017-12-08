@@ -12,6 +12,11 @@ namespace StarshipTheory.ModLib.GUI
     /// </summary>
     public class Window : GUIItem, IGroupItem
     {
+        /* TODO: Fix Window Resizing
+         * 
+         * 
+         */
+
         /// <summary>
         /// A unique Index to use for each window. This is the Index you'll use to interface to it.
         /// <see cref="StarshipTheory.ModLib.ModGUI.GetWindowIndex"></see>
@@ -58,6 +63,8 @@ namespace StarshipTheory.ModLib.GUI
         private Space leftSpacer;
         private Space rightSpacer;
         private Space bottomSpacer;
+
+        private UnityEngine.GUI.WindowFunction _OnDrawFunc = null;
 
 
         /// <summary>
@@ -119,7 +126,10 @@ namespace StarshipTheory.ModLib.GUI
 
             if (this.Visible)
             {
-                Rect = GUILayout.Window(Index, Rect, new UnityEngine.GUI.WindowFunction(_OnDraw), new GUIContent(Title, Image, Tooltip), Style, Options);
+                if (_OnDrawFunc == null)
+                    _OnDrawFunc = new UnityEngine.GUI.WindowFunction(_OnDraw);
+
+                Rect = GUILayout.Window(Index, Rect, _OnDrawFunc, new GUIContent(Title, Image, Tooltip), Style, Options);
             }
         }
 

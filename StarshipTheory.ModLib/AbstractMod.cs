@@ -88,6 +88,14 @@ namespace StarshipTheory.ModLib
         /// </summary>
         public virtual void OnGUI() { }
 
+        /// <summary>
+        /// Used to display an in-game error window.
+        /// </summary>
+        /// <param name="error"></param>
+        protected void DisplayError(Exception error)
+        {
+            ModLoader.Instance.ShowError(this, error);
+        }
 
         internal void ToggleModWindow(UnityEngine.Rect? position = null)
         {

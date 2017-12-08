@@ -7,39 +7,12 @@ using UnityEngine;
 
 namespace ExporterImporter.Mod
 {
-    public class TileData2
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public BuildData.BuildDataRotation Rotation { get; set; }
-        public String Type { get; set; }
-
-        public int NumParts { get; set; }
-
-        public TileData2()
-        {
-        }
-
-        public TileData2(int X, int Y, String Type) : this()
-        {
-            this.X = X;
-            this.Y = Y;
-            this.Type = Type;
-        }
-
-        public TileData2(int X, int Y, String Type, BuildData.BuildDataRotation Rotation) : this(X, Y, Type)
-        {
-            this.Rotation = Rotation;
-        }
-    }
-
     public class TileData
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public BuildData.BuildDataRotation Rotation { get; set; }
+        public TileRotation Rotation { get; set; }
         public String TileType { get; set; }
-        public String StructureType { get; set; }
 
         public List<Vec3> StructureParts { get; set; }
 
@@ -65,5 +38,13 @@ namespace ExporterImporter.Mod
             }
         }
 
+
+        public enum TileRotation : int
+        {
+            UP = 0,
+            RIGHT = 1,
+            DOWN = 2,
+            LEFT = 3
+        }
     }
 }

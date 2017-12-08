@@ -152,7 +152,6 @@ namespace StarshipTheory.ModLib
                 }
                 catch(Exception ex)
                 {
-                    //TODO: Show Mod error window
                     ShowError(M, ex, "Game Started");
                     UnityEngine.Debug.LogError(ex);
                 }
@@ -173,7 +172,6 @@ namespace StarshipTheory.ModLib
                 }
                 catch (Exception ex)
                 {
-                    //TODO: Show Mod error window
                     ShowError(M, ex, "Game Loaded");
                     UnityEngine.Debug.LogError(ex);
                 }
@@ -194,7 +192,6 @@ namespace StarshipTheory.ModLib
                 }
                 catch (Exception ex)
                 {
-                    //TODO: Show Mod error window
                     ShowError(M, ex, "Game Saved");
                     UnityEngine.Debug.LogError(ex);
                 }
