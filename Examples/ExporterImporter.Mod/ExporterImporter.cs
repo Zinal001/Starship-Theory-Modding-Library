@@ -2,6 +2,7 @@
 using System.Text;
 using StarshipTheory.ModLib;
 using GUI = StarshipTheory.ModLib.GUI;
+using Events = StarshipTheory.ModLib.Events;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -10,15 +11,15 @@ namespace ExporterImporter.Mod
     /// <summary>
     /// W.I.P
     /// </summary>
-    public class ExporterImporter : AbstractMod
+    public class ExporterImporter : StarshipTheory.ModLib.Mod
     {
         private GameObject _Manager;
 
-        public override string ModName => "Exporter/Importer";
+        /*public override string ModName => "Exporter/Importer";
 
         public override Version ModVersion => new Version("1.0.0");
 
-        public override string ModDescription => "Export/Import ship design";
+        public override string ModDescription => "Export/Import ship design";*/
 
         private bool _GameStarted = false;
 
@@ -26,13 +27,19 @@ namespace ExporterImporter.Mod
 
         private GUIStyle _loadingBoxStyle;
 
+        public ExporterImporter()
+        {
+            Events.GameEvents.GameLoaded += GameEvents_GameLoaded;
+            Events.GameEvents.GameStarted += GameEvents_GameStarted;
+        }
+
         public override void OnInitialize()
         {
             _Manager = GameObject.Find("Manager");
 
         }
 
-        public override void FirstGUIPass()
+        public override void OnCreateGUI()
         {
             _loadingBoxStyle = new GUIStyle(UnityEngine.GUI.skin.box) {
                 alignment = TextAnchor.MiddleCenter,
@@ -382,15 +389,13 @@ namespace ExporterImporter.Mod
             }
         }
 
-        public override void OnGameLoad(int saveSlot)
+        private void GameEvents_GameStarted(object sender, EventArgs e)
         {
-            base.OnGameLoad(saveSlot);
             _GameStarted = true;
         }
 
-        public override void OnGameStarted()
+        private void GameEvents_GameLoaded(object sender, Events.GameEvents.SaveLoadEventArgs e)
         {
-            base.OnGameStarted();
             _GameStarted = true;
         }
 

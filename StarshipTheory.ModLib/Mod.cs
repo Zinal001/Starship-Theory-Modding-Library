@@ -8,22 +8,9 @@ namespace StarshipTheory.ModLib
     /// <para>The abstract Mod class.</para>
     /// <para>Note: The exported dll filename needs to end with .Mod.dll for the modloader to recognize it as a mod</para>
     /// </summary>
-    public abstract class AbstractMod
+    public abstract class Mod
     {
-        /// <summary>
-        /// The Display name of the mod
-        /// </summary>
-        public abstract String ModName { get; }
-
-        /// <summary>
-        /// The Version of the mod
-        /// </summary>
-        public abstract Version ModVersion { get; }
-
-        /// <summary>
-        /// A description of what the mod does
-        /// </summary>
-        public virtual String ModDescription { get; }
+        public ModInfo Info { get; internal set; }
 
         /// <summary>
         /// Whenever this mod is enabled or not (Defaults to true)
@@ -48,7 +35,7 @@ namespace StarshipTheory.ModLib
 
         internal bool _FirstGuiPassCalled = false;
 
-        public AbstractMod()
+        public Mod()
         {
 
         }
@@ -60,27 +47,10 @@ namespace StarshipTheory.ModLib
         public abstract void OnInitialize();
 
         /// <summary>
-        /// This method is called when a new game is started
-        /// </summary>
-        public virtual void OnGameStarted() { }
-
-        /// <summary>
-        /// This method is called when a game is being loaded from a previous save
-        /// </summary>
-        /// <param name="saveSlot"></param>
-        public virtual void OnGameLoad(int saveSlot) { }
-
-        /// <summary>
-        /// This method is called when a game is being saved to a slot
-        /// </summary>
-        /// <param name="saveSlot"></param>
-        public virtual void OnGameSave(int saveSlot) { }
-
-        /// <summary>
         /// <para>This method is called by the modloader at the first gui pass.</para>
         /// <para>Use this method to create your desired mod window components.</para>
         /// </summary>
-        public virtual void FirstGUIPass() { }
+        public virtual void OnCreateGUI() { }
 
         /// <summary>
         /// This method is called by the modloader whenever custom gui should be drawn.

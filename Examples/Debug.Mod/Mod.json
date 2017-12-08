@@ -1,0 +1,9 @@
+﻿{
+  "Name": "Debug",
+  "DisplayName": "Debug Mod",
+  "Version": "1.0.0",
+  "Description": "",
+  "Author": "Zinal",
+  "EntryDLL": "Debug.Mod.dll",
+  "Dependencies": []
+}

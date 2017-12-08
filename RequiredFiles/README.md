@@ -11,6 +11,7 @@ The files listed below is usually found in SST's installation directory under St
 * Assembly-CSharp.dll
 * Assembly-CSharp-firstpass.dll
 * ES2.dll
+* Pathfinding.JsonFx.dll
 * UnityEngine.dll
 * UnityEngine.UI.dll
 

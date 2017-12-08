@@ -63,13 +63,13 @@ namespace StarshipTheory.ModLib
             ModLoader.Instance.__OnGui();
             _tick++;
 
-            foreach (AbstractMod M in ModLoader.Instance.Mods.Where(m => m.Enabled))
+            foreach (Mod M in ModLoader.Instance.Mods.Where(m => m.Enabled))
             {
                 try
                 {
                     if (!M._FirstGuiPassCalled)
                     {
-                        M.FirstGUIPass();
+                        M.OnCreateGUI();
                         M._FirstGuiPassCalled = true;
                     }
 
@@ -84,6 +84,8 @@ namespace StarshipTheory.ModLib
                     UnityEngine.Debug.LogError(ex);
                 }
             }
+
+
         }
     }
 }
