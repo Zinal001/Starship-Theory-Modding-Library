@@ -15,12 +15,6 @@ namespace ExporterImporter.Mod
     {
         private GameObject _Manager;
 
-        /*public override string ModName => "Exporter/Importer";
-
-        public override Version ModVersion => new Version("1.0.0");
-
-        public override string ModDescription => "Export/Import ship design";*/
-
         private bool _GameStarted = false;
 
         private bool _IsImporting = false;

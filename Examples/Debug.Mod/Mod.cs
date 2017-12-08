@@ -6,16 +6,6 @@ namespace Debug.Mod
 {
     public class Debug : StarshipTheory.ModLib.Mod
     {
-        /// <summary>
-        /// The display name of the mod
-        /// </summary>
-        /*public override string ModName => "Debug Mod";
-
-        /// <summary>
-        /// The current version of the mod
-        /// </summary>
-        public override Version ModVersion => new Version("1.0.0");*/
-
         private GameObject _Manager;
 
         private StarshipTheory.ModLib.GUI.Button _ToggleBtn;
