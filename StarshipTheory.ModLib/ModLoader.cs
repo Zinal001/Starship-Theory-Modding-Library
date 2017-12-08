@@ -110,7 +110,7 @@ namespace StarshipTheory.ModLib
                             String dllFile = System.IO.Path.Combine(modDir.FullName, modInfo.EntryDLL);
                             if (String.IsNullOrEmpty(modInfo.EntryDLL) || !System.IO.File.Exists(dllFile))
                                 throw new System.IO.FileNotFoundException("Missing EntryDLL file");
-
+                            
                             System.Reflection.Assembly ModAssembly = System.Reflection.Assembly.LoadFile(dllFile);
                             bool ModTypeFound = false;
                             foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && t.IsPublic && !t.IsInterface && !t.IsAbstract))
@@ -192,51 +192,6 @@ namespace StarshipTheory.ModLib
                 modBtn.Clicked += ModBtn_Clicked;
                 _ModListButtonArea.Items.Add(modBtn);
             }
-
-            /*foreach (System.IO.FileInfo DllFile in ModsFolderInfo.GetFiles("*.Mod.dll", System.IO.SearchOption.AllDirectories))
-            {
-                try
-                {
-                    System.Reflection.Assembly ModAssembly = System.Reflection.Assembly.LoadFile(DllFile.FullName);
-                    bool ModTypeFound = false;
-                    foreach (Type T in ModAssembly.GetTypes().Where(t => t.IsSubclassOf(AbstractModType) && t.IsPublic && !t.IsInterface && !t.IsAbstract))
-                    {
-                        Mod M = (Mod)Activator.CreateInstance(T);
-                        if (M != null)
-                        {
-                            M.ModWindow = new GUI.Window(ModGUI.GetWindowIndex(), M.ModName)
-                            {
-                                Visible = false,
-                                IsDraggable = true,
-                                IsResizeable = true,
-                                _drawingMod = M,
-                                MinWidth = 200,
-                                MaxWidth = UnityEngine.Screen.width,
-                                MinHeight = 20,
-                                MaxHeight = UnityEngine.Screen.height
-                            };
-
-                            M.ModFolder = DllFile.Directory.FullName;
-                            M.Enabled = true;
-
-                            GUI.Button modBtn = new GUI.Button(M.ModName) { Tag = M, Visible = false };
-                            modBtn.Clicked += ModBtn_Clicked;
-                            _ModListButtonArea.Items.Add(modBtn);
-
-                            _Mods.Add(M);
-                            ModTypeFound = true;
-                        }
-                    }
-
-                    if (!ModTypeFound)
-                        UnityEngine.Debug.LogWarning("No mod found in file " + DllFile.Name + " but it's designated as a mod");
-                }
-                catch (Exception ex)
-                {
-                    ShowError(DllFile.Name.Replace(".Mod.dll", ""), "", ex, "Load");
-                    UnityEngine.Debug.LogError("Failed to initialize mod from file " + DllFile.Name + ": " + ex.Message);
-                }
-            }*/
         }
 
         private bool _FirstPass = true;
