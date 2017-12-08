@@ -36,6 +36,76 @@ namespace ExporterImporter.Mod
             }
         }
 
+        public static void RemoveTile(Vector2 position, GameObject ship)
+        {
+            int X = (int)position.x;
+            int Y = (int)position.y;
+
+            Tiles shipTiles = ship.GetComponent<Tiles>();
+            Structures shipStructures = ship.GetComponent<Structures>();
+
+            TileInfo tile = shipTiles.tiles[X, Y];
+
+            if (tile.structureType != null && tile.isPowered)
+            {
+                shipStructures.powerStructure(X, Y, tile.structureType, false, "TileHelper.RemoveTile");
+                Debug.Log("Powering down " + tile.structureType + " (" + X + ", " + Y + ")");
+            }
+
+            if (tile.structureType == null)
+                shipStructures.removeFromStructureList(X, Y, tile.tileType, "TileHelper.RemoveTile");
+            else
+            {
+                if (tile.structureParts.Count > 0)
+                {
+                    Vector3 partPos = tile.structureParts[0];
+                    shipStructures.removeFromStructureList((int)partPos.x, (int)partPos.y, tile.structureType, "TileHelper.RemoveTile");
+                    Debug.Log("Remove structure " + tile.structureType + " (" + partPos.x + ", " + partPos.y + ")");
+                }
+                else
+                    shipStructures.removeFromStructureList(X, Y, tile.structureType, "TileHelper.RemoveTile");
+            }
+            
+            if(ship.name == "TileMap")
+            {
+                if (tile.structureParts.Count > 0)
+                {
+                    Vector3 partPos = tile.structureParts[0];
+                    GameObject.Find("Manager").GetComponent<MouseUI>().removeStructureFromControlGroup((int)partPos.x, (int)partPos.y);
+                }
+                else
+                    GameObject.Find("Manager").GetComponent<MouseUI>().removeStructureFromControlGroup(X, Y);
+            }
+
+            if(tile.structureType != null)
+            {
+                if(tile.structureParts.Count > 0)
+                {
+                    foreach(Vector3 pos in tile.structureParts)
+                    {
+                        shipTiles.tiles[(int)pos.x, (int)pos.y].structureType = null;
+                        shipTiles.tiles[(int)pos.x, (int)pos.y].toBecome = null;
+                    }
+                }
+                else
+                    shipTiles.tiles[X, Y].structureType = null;
+            }
+
+            shipTiles.tiles[X, Y].structureType = null;
+            shipTiles.tiles[X, Y].tileType = null;
+            shipTiles.tiles[X, Y].toBecome = null;
+            shipTiles.tiles[X, Y].letterValue = null;
+            shipTiles.tiles[X, Y].removeJob = true;
+            GameObject.Find("Manager").GetComponent<ManagerJobs>().removeJob(X, Y, ship);
+            GameObject.Find("Manager").GetComponent<ManagerJobs>().removeJobSettings(X, Y, ship, true);
+            shipTiles.tiles[X, Y].removeJob = false;
+
+            shipTiles.tiles[X, Y].structureParts.Clear();
+
+            shipTiles.updateTexture(X, Y, true, "TileHelper.RemoveTile");
+            shipTiles.updateTileMesh("All");
+        }
+
         public static void RemoveTiles(IEnumerable<Vector2> positions)
         {
             RemoveTiles(positions.ToArray());
@@ -49,8 +119,10 @@ namespace ExporterImporter.Mod
 
             foreach (Vector2 pos in positions)
             {
-                shipTiles.tiles[(int)pos.x, (int)pos.y].toBecome = "Remove";
-                managerJobs.completeJob((int)pos.x, (int)pos.y, tileMap, false, false);
+                RemoveTile(pos, tileMap);
+
+                /*shipTiles.tiles[(int)pos.x, (int)pos.y].toBecome = "Remove";
+                managerJobs.completeJob((int)pos.x, (int)pos.y, tileMap, false, false);*/
             }
         }
 
@@ -67,46 +139,140 @@ namespace ExporterImporter.Mod
 
             foreach (TileData td in tiles)
             {
-                if(!buildData.ContainsKey(td.Type))
+                if(!buildData.ContainsKey(td.TileType))
                 {
-                    Debug.LogWarning("Missing Build Data for type " + td.Type);
+                    Debug.LogWarning("Missing Build Data for type " + td.TileType);
                     continue;
                 }
 
-                shipTiles.tiles[(int)td.X, (int)td.Y].toBecome = td.Type;
-                foreach (BuildData.Part part in buildData[td.Type].Parts)
+                shipTiles.tiles[td.X, td.Y].toBecome = td.TileType;
+
+                if (buildData[td.TileType].Parts.Length > 0)
                 {
-                    float rX = td.X + part.RelativeX;
-                    float rY = td.Y + part.RelativeY;
+                    List<Vector3> partsList = new List<Vector3>();
+                    List<Vector2> tilesList = new List<Vector2>();
 
-                    //Add part to THIS tile
-                    shipTiles.tiles[(int)td.X, (int)td.Y].structureParts.Add(new Vector3(rX, rY, buildData[td.Type].Rotation));
-
-                    if(part.RelativeX != 0f && part.RelativeY != 0f)
+                    for(int i = 0; i < buildData[td.TileType].Parts.Length; i++)
                     {
-                        shipTiles.tiles[(int)rX, (int)rY].toBecome = td.Type;
-
-                        foreach(Vector3 vect in shipTiles.tiles[(int)td.X, (int)td.Y].structureParts)
+                        BuildData.Part part = buildData[td.TileType].Parts[i];
+                        int rX = td.X;
+                        int rY = td.Y;
+                        
+                        if (buildData[td.TileType].AllowRotation)
                         {
-                            if (vect.x == rX && vect.y == rY && vect.z == buildData[td.Type].Rotation)
-                                continue;
-
-                            shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(vect);
+                            rX += part.RelativeX;
+                            rY += part.RelativeY;
                         }
 
-                        shipTiles.tiles[(int)rX, (int)rY].structureParts.Add(new Vector3(rX, rY, buildData[td.Type].Rotation));
+                        Vector2 tilePos = new Vector2(rX, rY);
+                        if(!tilesList.Contains(tilePos))
+                            tilesList.Add(tilePos);
+                        
+                        Vector3 partData = new Vector3(rX, rY, (int)td.Rotation);
+
+                        if(!partsList.Contains(partData))
+                            partsList.Add(partData);
                     }
-                    
+
+                    if(partsList.Count > 0)
+                    {
+                        String str = "Parts for " + td.TileType + "(" + td.X + ", " + td.Y + "):\n";
+
+                        foreach (Vector2 tilePos in tilesList)
+                        {
+                            shipTiles.tiles[(int)tilePos.x, (int)tilePos.y].toBecome = td.TileType;
+
+                            str += String.Format("\tPos: {0}, {1}, {2}\n", tilePos.x, tilePos.y, shipTiles.tiles[(int)tilePos.x, (int)tilePos.y].toBecome);
+
+                            foreach (Vector3 part in partsList)
+                            {
+                                shipTiles.tiles[(int)tilePos.x, (int)tilePos.y].structureParts.Add(part);
+                                str += String.Format("Part: {0}, {1}, {2}\n", part.x, part.y, part.z);
+                            }
+                        }
+
+                        str += "\n";
+                        Debug.Log(str);
+                    }
 
 
+                    /*for(int i = 0; i < buildData[td.TileType].Parts.Length; i++)
+                    {
+                        BuildData.Part part = buildData[td.TileType].Parts[i];
+                        int rX = td.X;
+                        int rY = td.Y;
 
-                    //managerJobs.completeJob((int)rX, (int)rY, tileMap, false, false);
+                        if(buildData[td.TileType].AllowRotation)
+                        {
+                            rX += part.RelativeX;
+                            rY += part.RelativeY;
+                        }
+
+                        shipTiles.tiles[rX, rY].toBecome = td.TileType;
+
+                        for (int j = 0; j < buildData[td.TileType].Parts.Length; j++)
+                        {
+                            BuildData.Part part2 = buildData[td.TileType].Parts[j];
+                            int dX = td.X;
+                            int dY = td.Y;
+
+                            if (buildData[td.TileType].AllowRotation)
+                            {
+                                dX += part2.RelativeX;
+                                dY += part2.RelativeY;
+                            }
+
+                            int Rotation = 0;
+                            if (td.TileType == "MiniEngine")
+                                Rotation = 2;
+
+                            shipTiles.tiles[rX, rY].structureParts.Add(new Vector3(dX, dY, Rotation));
+                        }
+
+                        String str = "StructurePart for " + td.TileType + "(" + rX + ", " + rY + ")\n";
+
+                        foreach (Vector3 vec in shipTiles.tiles[rX, rY].structureParts)
+                            str += vec.x + ", " + vec.y + ", " + vec.z + "\n";
+
+                        str += "\n";
+                        Debug.Log(str);
+                    }*/
+
                 }
 
                 managerJobs.completeJob((int)td.X, (int)td.Y, tileMap, false, false);
+                shipTiles.tiles[td.X, td.Y].leakValue = 0;
             }
         }
 
+        private static Vector3 OffsetTile(Vector3 vect, BuildData.BuildDataRotation rotation, int length)
+        {
+            if (length == 0)
+                return vect;
+
+            int dX = (int)vect.x;
+            int dY = (int)vect.y;
+
+            switch(rotation)
+            {
+                case BuildData.BuildDataRotation.UP:
+                    dY += length;
+                    break;
+                case BuildData.BuildDataRotation.RIGHT:
+                    dX += length;
+                    break;
+                case BuildData.BuildDataRotation.DOWN:
+                    dY -= length;
+                    break;
+                case BuildData.BuildDataRotation.LEFT:
+                    dX -= length;
+                    break;
+            }
+
+            return new Vector3(dX, dY, vect.z);
+
+        }
+        
 
     }
 }

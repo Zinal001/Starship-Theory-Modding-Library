@@ -24,6 +24,8 @@ namespace ExporterImporter.Mod
 
         private bool _IsImporting = false;
 
+        private GUIStyle _loadingBoxStyle;
+
         public override void OnInitialize()
         {
             _Manager = GameObject.Find("Manager");
@@ -34,6 +36,11 @@ namespace ExporterImporter.Mod
 
         public override void FirstGUIPass()
         {
+            _loadingBoxStyle = new GUIStyle(UnityEngine.GUI.skin.box) {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 16
+            };
+
             GUI.Group btnGroup = new GUI.Group(GUI.GUIItem.Direction.Horizontal);
 
             GUI.Button exportBtn = new GUI.Button("Export");
@@ -61,36 +68,51 @@ namespace ExporterImporter.Mod
 
                 if(shipTiles != null)
                 {
-                    List<TileData> tiles = new List<TileData>();
+                    String json = System.IO.File.ReadAllText(System.IO.Path.Combine(ModFolder, "Design.json"), Encoding.UTF8);
 
+                    TileData[] tiles = Pathfinding.Serialization.JsonFx.JsonReader.Deserialize<TileData[]>(json);
+                    #region testData
+                    /*List<TileData> tiles = new List<TileData>();
                     for(int x = 50; x <= 60; x++)
                     {
                         for(int y = 50; y <= 60; y++)
                         {
                             if (x == 50 || x == 60 || y == 50 || y == 60)
-                                tiles.Add(new TileData(x, y, "Hull"));
+                            {
+                                if(x == 50 && y == 50)
+                                    tiles.Add(new TileData(x, y, "HullCorner", BuildData.BuildDataRotation.LEFT));
+                                else if(x == 60 && y == 50)
+                                    tiles.Add(new TileData(x, y, "HullCorner", BuildData.BuildDataRotation.DOWN));
+                                else if(x == 50 && y == 60)
+                                    tiles.Add(new TileData(x, y, "HullCorner", BuildData.BuildDataRotation.UP));
+                                else if(x == 60 && y == 60)
+                                    tiles.Add(new TileData(x, y, "HullCorner", BuildData.BuildDataRotation.RIGHT));
+                                else
+                                    tiles.Add(new TileData(x, y, "Hull"));
+                            }
                             else
                                 tiles.Add(new TileData(x, y, "Floor"));
 
-                            if(y == 50)
+                            if (y == 50)
                             {
-                                if (x == 50)
+                                if (x == 51)
                                     tiles.Add(new TileData(x, y, "CargoRack"));
-                                else if (x == 51)
-                                    tiles.Add(new TileData(x, y, "Airlock"));
                                 else if (x == 52)
-                                    tiles.Add(new TileData(x, y, "SSolar"));
+                                    tiles.Add(new TileData(x, y, "Airlock"));
                                 else if (x == 53)
+                                    tiles.Add(new TileData(x, y, "SSolar"));
+                                else if (x == 54)
                                     tiles.Add(new TileData(x, y, "CPUPanel"));
                             }
-                            else if(x == 55 && y == 55)
+                            else if (x == 55 && y == 55)
                                 tiles.Add(new TileData(x, y, "ShipCore"));
-                            else if(y == 50 && x == 55)
-                                tiles.Add(new TileData(x, y, "MiniEngine"));
-                        }
-                    }
 
-                    //Build queue: Hull, Floor, ShipCore, Structures
+                            if (y == 50 && x == 55)
+                                tiles.Add(new TileData(x, y, "MiniEngine", BuildData.BuildDataRotation.DOWN));
+                        }
+                    }*/
+                    #endregion
+
                     List<TileData> hull = new List<TileData>();
                     List<TileData> floor = new List<TileData>();
                     TileData shipCore = null;
@@ -98,23 +120,50 @@ namespace ExporterImporter.Mod
 
                     foreach (TileData td in tiles)
                     {
-                        if (td.Type == "Hull")
+                        List<TileData.Vec3> StructureParts = new List<TileData.Vec3>();
+                        StructureParts.AddRange(td.StructureParts);
+                        td.StructureParts = new List<TileData.Vec3>();
+
+                        if (td.TileType == "Hull" || td.TileType == "HullCorner")
                             hull.Add(td);
-                        else if (td.Type == "Floor")
+                        else if (td.TileType == "Floor")
                             floor.Add(td);
-                        else if (td.Type == "ShipCore")
-                            shipCore = td;
-                        else
-                            other.Add(td);
+
+                        if (td.StructureType == "ShipCore")
+                            shipCore = new TileData() { X = td.X, Y = td.Y, TileType = td.StructureType, StructureParts = StructureParts };
+                        else if (!String.IsNullOrEmpty(td.StructureType))
+                            other.Add(new TileData() { X = td.X, Y = td.Y, TileType = td.StructureType, StructureParts = StructureParts });
                     }
 
                     if(shipCore == null)
                         throw new Exception("Ship Design is missing required tile ShipCore");
 
                     _IsImporting = true;
+                    _Manager.GetComponent<ManagerMenu>().toggleMainMenu();
                     managerMenu.StartCoroutine(UpdateTiles(shipTiles, managerJobs, managerOptions, tileMap, hull, floor, shipCore, other));
                     managerMenu.StartCoroutine(FixPoweredTiles(other, tileMap.GetComponent<Structures>()));
+                    managerMenu.StartCoroutine(OnImportFinished(tiles));
                 }
+            }
+        }
+
+        private System.Collections.IEnumerator OnImportFinished(TileData[] tiles)
+        {
+            while(true)
+            {
+                if(!_IsImporting)
+                {
+                    Tiles shipTiles = GameObject.Find("TileMap").GetComponent<Tiles>();
+                    Structures shipStructures = GameObject.Find("TileMap").GetComponent<Structures>();
+                    foreach (TileData td in tiles)
+                    {
+                        shipTiles.tiles[td.X, td.Y].leakValue = 0;
+                        shipStructures.stopLeakSource(td.X, td.Y);
+                    }
+                    break;
+                }
+
+                yield return new WaitForSeconds(0.01f);
             }
         }
 
@@ -125,7 +174,7 @@ namespace ExporterImporter.Mod
                 if(!_IsImporting)
                 {
                     foreach (TileData td in tiles)
-                        structures.powerStructure((int)td.X, (int)td.Y, td.Type, true, "ExporterImporter.FixPoweredTiles");
+                        structures.powerStructure((int)td.X, (int)td.Y, td.StructureType, true, "ExporterImporter.FixPoweredTiles");
 
                     break;
                 }
@@ -140,7 +189,7 @@ namespace ExporterImporter.Mod
             if (managerOptions != null)
             {
                 deadCrewEndGame = managerOptions.deadCrewEndGame;
-                managerOptions.deadCrewEndGame = false; //Make sure that the crew can't die while importing the ship.
+                managerOptions.deadCrewEndGame = false;
             }
             yield return new WaitForSeconds(0.01f);
             
@@ -153,8 +202,18 @@ namespace ExporterImporter.Mod
             int cargoFood = structures.structure[0].reservesFood;
             int cargoCredits = structures.structure[0].credits;
 
-            Vector2[] tilesToRemove = new Vector2[structures.structure[0].allTilesList.Count];
-            structures.structure[0].allTilesList.CopyTo(tilesToRemove, 0);
+            List<Vector2> tilesToRemove = new List<Vector2>();
+
+            for(int x = shipTiles.tiles.GetLowerBound(0); x <= shipTiles.tiles.GetUpperBound(0); x++)
+            {
+                for(int y = shipTiles.tiles.GetLowerBound(1); y <= shipTiles.tiles.GetUpperBound(1); y++)
+                {
+                    if (String.IsNullOrEmpty(shipTiles.tiles[x, y].toBecome) && String.IsNullOrEmpty(shipTiles.tiles[x, y].tileType) && String.IsNullOrEmpty(shipTiles.tiles[x, y].structureType))
+                        continue;
+
+                    tilesToRemove.Add(new Vector2(x, y));
+                }
+            }
 
             TileHelper.RemoveTiles(tilesToRemove);
             yield return new WaitForSeconds(0.01f);
@@ -214,6 +273,8 @@ namespace ExporterImporter.Mod
             managerResources.updateCredits(cargoCredits, false);
             yield return new WaitForSeconds(0.01f);
 
+            _Manager.GetComponent<ManagerMenu>().toggleMainMenu();
+
             _IsImporting = false;
         }
 
@@ -221,79 +282,74 @@ namespace ExporterImporter.Mod
         {
             if(_GameStarted && _Manager != null)
             {
-                MouseUI mouseUI = _Manager.GetComponent<MouseUI>();
+                List<String> allowedTiles = new List<string>() {
+                    "Hull",
+                    "HullCorner",
+                    "Floor"
+                };
 
-                Tiles shipTiles = mouseUI._ModGet_TileMap().GetComponent<Tiles>();
-                Structures structures = mouseUI._ModGet_TileMap().GetComponent<Structures>();
+                GameObject tileMap = GameObject.Find("TileMap");
+                Tiles shipTiles = tileMap.GetComponent<Tiles>();
+                Structures structures = tileMap.GetComponent<Structures>();
                 if (shipTiles != null && structures != null)
                 {
-                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter("Design.txt", false, Encoding.UTF8))
+                    List<Vector2> ignoreTileData = new List<Vector2>();
+                    List<TileData> tiles = new List<TileData>();
+
+                    foreach(Vector2 pos in structures.structure[0].allTilesList)
                     {
-                        for (int x = shipTiles.tiles.GetLowerBound(0); x <= shipTiles.tiles.GetUpperBound(0); x++)
+                        TileInfo info = shipTiles.tiles[(int)pos.x, (int)pos.y];
+
+                        if (ignoreTileData.Contains(pos))
                         {
-                            for (int y = shipTiles.tiles.GetLowerBound(1); y <= shipTiles.tiles.GetUpperBound(1); y++)
-                            {
-                                if (String.IsNullOrEmpty(shipTiles.tiles[x, y].tileType) && String.IsNullOrEmpty(shipTiles.tiles[x, y].toBecome) && String.IsNullOrEmpty(shipTiles.tiles[x, y].structureType))
-                                    continue;
-
-                                TileData td = new TileData(x, y, String.IsNullOrEmpty(shipTiles.tiles[x, y].tileType) ? shipTiles.tiles[x, y].toBecome : shipTiles.tiles[x, y].tileType);
-
-                                /*for (int sIndex = 0; sIndex < shipTiles.tiles[x, y].structureParts.Count; sIndex++)
-                                    td.StructDatas.Add(new TileData.StructData(shipTiles.tiles[x, y].structureParts[sIndex].x, shipTiles.tiles[x, y].structureParts[sIndex].y, shipTiles.tiles[x, y].structureParts[sIndex].z));*/
-                                
-                                td.Structures.AddRange(GetStructuresAt2(structures, x, y));
-                                
-                                td.WriteTo(sw);
-                            }
+                            if (!allowedTiles.Contains(info.structureType) && !allowedTiles.Contains(info.toBecome))
+                                continue;
                         }
+
+                        ignoreTileData.Add(pos);
+
+                        /*TileData td = new TileData
+                        {
+                            Type = String.IsNullOrEmpty(info.tileType) ? info.toBecome : info.tileType,
+                            X = (int)pos.x,
+                            Y = (int)pos.y,
+                            Rotation = BuildData.BuildDataRotation.UP,
+                            NumParts = info.structureParts.Count
+                        };*/
+
+                        List<TileData.Vec3> StructureParts = new List<TileData.Vec3>();
+                        foreach (Vector3 vec in info.structureParts)
+                            StructureParts.Add(TileData.Vec3.FromVector(vec));
+
+                        TileData td = new TileData() {
+                            TileType = info.tileType,
+                            X = (int)pos.x,
+                            Y = (int)pos.y,
+                            StructureType = info.structureType,
+                            StructureParts = StructureParts
+                        };
+
+                        /*foreach(Vector3 part in info.structureParts)
+                        {
+                            if (part.x == pos.x && part.y == pos.y)
+                                td.Rotation = (BuildData.BuildDataRotation)((int)part.z);
+
+                            ignoreTileData.Add(new Vector2(part.x, part.y));
+                        }*/
+
+                        tiles.Add(td);
+
+                        /*if (!String.IsNullOrEmpty(info.structureType))
+                            tiles.Add(new TileData(td.X, td.Y, info.structureType, td.Rotation));*/
+                    }
+
+                    if(tiles.Count > 0)
+                    {
+                        String json = Pathfinding.Serialization.JsonFx.JsonWriter.Serialize(tiles.ToArray());
+                        System.IO.File.WriteAllText(System.IO.Path.Combine(ModFolder, "Design.json"), json, Encoding.UTF8);
                     }
                 }
             }
-        }
-
-        private void ParseDesignFile()
-        {
-            
-        }
-
-        private static readonly List<String> IgnoreExportingStructures = new List<string>() { "SCrate", "MCrate", "LCrate", "Floor", "Hull", "HullCorner" };
-
-        private List<String> GetStructuresAt(Structures structures, float x, float y)
-        {
-            List<String> structs = new List<String>();
-            foreach (StarshipTheory.ModLib.Resources.EntityCost cost in StarshipTheory.ModLib.Resources.Costs.GetEntityCosts())
-            {
-                if (IgnoreExportingStructures.Contains(cost.Internal_Name))
-                    continue;
-
-                foreach (Vector2 pos in structures.allStructuresOfType(cost.Internal_Name))
-                {
-                    //Format: X Y STRUCTURE_NAME
-                    if(pos.x == x && pos.y == y)
-                        structs.Add(String.Format("STRUCT {0} {1} {2}", pos.x, pos.y, cost.Internal_Name));
-                }
-            }
-
-            return structs;
-        }
-
-        private List<StructureData> GetStructuresAt2(Structures structures, float x, float y)
-        {
-            List<StructureData> structs = new List<StructureData>();
-            foreach (StarshipTheory.ModLib.Resources.EntityCost cost in StarshipTheory.ModLib.Resources.Costs.GetEntityCosts())
-            {
-                /*if (IgnoreExportingStructures.Contains(cost.Internal_Name))
-                    continue;*/
-
-                foreach (Vector2 pos in structures.allStructuresOfType(cost.Internal_Name))
-                {
-                    //Format: X Y STRUCTURE_NAME
-                    if (pos.x == x && pos.y == y)
-                        structs.Add(new StructureData(pos.x, pos.y, cost.Internal_Name));
-                }
-            }
-
-            return structs;
         }
 
         public override void OnGameLoad(int saveSlot)
@@ -312,10 +368,7 @@ namespace ExporterImporter.Mod
         {
             if (_IsImporting)
             {
-                float x = (UnityEngine.Screen.width / 2) - 60f;
-                float y = (UnityEngine.Screen.height / 2) - 60f;
-
-                UnityEngine.GUI.Label(new Rect(x, y, 120, 120), "Importing...", new GUIStyle(UnityEngine.GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
+                UnityEngine.GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "Importing Design, Please wait...", _loadingBoxStyle);
             }
 
         }

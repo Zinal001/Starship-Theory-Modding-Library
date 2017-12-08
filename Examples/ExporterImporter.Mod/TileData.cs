@@ -3,159 +3,67 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace ExporterImporter.Mod
 {
-    public class TileData
+    public class TileData2
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public BuildData.BuildDataRotation Rotation { get; set; }
         public String Type { get; set; }
 
-        public List<StructData> StructDatas { get; private set; }
+        public int NumParts { get; set; }
 
-        public List<StructureData> Structures { get; private set; }
-
-        public TileData()
+        public TileData2()
         {
-            this.StructDatas = new List<StructData>();
-            this.Structures = new List<StructureData>();
         }
 
-        public TileData(float X, float Y, String Type) : this()
+        public TileData2(int X, int Y, String Type) : this()
         {
             this.X = X;
             this.Y = Y;
             this.Type = Type;
         }
 
-
-        public void WriteTo(StreamWriter Writer)
+        public TileData2(int X, int Y, String Type, BuildData.BuildDataRotation Rotation) : this(X, Y, Type)
         {
-            Writer.WriteLine(String.Format("{0} {1} {2} {3} {4} {5}", X, Y, Type, StructDatas.Count, Structures.Count));
-
-            if(StructDatas.Count > 0)
-            {
-                for (int i = 0; i < StructDatas.Count; i++)
-                    Writer.WriteLine(String.Format("{0} {1} {2}", StructDatas[i].X, StructDatas[i].Y, StructDatas[i].Rotation));
-            }
-
-            if(Structures.Count > 0)
-            {
-                for (int i = 0; i < Structures.Count; i++)
-                    Writer.WriteLine(String.Format("{0} {1} {2}", Structures[i].X, Structures[i].Y, Structures[i].Type));
-            }            
-        }
-
-        public static TileData ReadFrom(StreamReader Reader)
-        {
-            try
-            {
-                TileData Res = new TileData();
-                String Line = Reader.ReadLine();
-                String[] Parts = Line.Trim().Split(' ');
-
-                Res.X = float.Parse(Parts[0]);
-                Res.Y = float.Parse(Parts[1]);
-                Res.Type = Parts[2];
-
-                int numStructs = int.Parse(Parts[4]);
-                for(int i = 0; i < numStructs; i++)
-                {
-                    StructData sd = StructData.ReadFrom(Reader);
-                    if (sd != null)
-                        Res.StructDatas.Add(sd);
-                }
-
-                int numStructures = int.Parse(Parts[5]);
-                for(int i = 0; i < numStructures; i++)
-                {
-                    StructureData sd = StructureData.ReadFrom(Reader);
-                    if (sd != null)
-                        Res.Structures.Add(sd);
-                }
-
-                return Res;
-            }
-            catch { }
-
-            return null;
-        }
-
-        public class StructData
-        {
-            public float X { get; set; }
-            public float Y { get; set; }
-            public float Rotation { get; set; }
-
-            public StructData()
-            {
-
-            }
-
-            public StructData(float X, float Y, float Rotation)
-            {
-                this.X = X;
-                this.Y = Y;
-                this.Rotation = Rotation;
-            }
-
-            public static StructData ReadFrom(StreamReader Reader)
-            {
-                try
-                {
-                    StructData Res = new StructData();
-                    String Line = Reader.ReadLine();
-                    String[] Parts = Line.Trim().Split(' ');
-
-                    Res.X = float.Parse(Parts[0]);
-                    Res.Y = float.Parse(Parts[1]);
-                    Res.Rotation = float.Parse(Parts[2]);
-
-                    return Res;
-                }
-                catch { }
-
-                return null;
-            }
+            this.Rotation = Rotation;
         }
     }
 
-    public class StructureData
+    public class TileData
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public String Type { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public BuildData.BuildDataRotation Rotation { get; set; }
+        public String TileType { get; set; }
+        public String StructureType { get; set; }
 
-        public StructureData()
+        public List<Vec3> StructureParts { get; set; }
+
+        public class Vec3
         {
+            public float X { get; set; }
+            public float Y { get; set; }
+            public float Z { get; set; }
 
-        }
-
-        public StructureData(float X, float Y, String Type)
-        {
-            this.X = X;
-            this.Y = Y;
-            this.Type = Type;
-        }
-
-        public static StructureData ReadFrom(StreamReader Reader)
-        {
-            try
+            public Vec3()
             {
-                StructureData Res = new StructureData();
-                String Line = Reader.ReadLine();
-                String[] Parts = Line.Trim().Split(' ');
 
-                Res.X = float.Parse(Parts[0]);
-                Res.Y = float.Parse(Parts[1]);
-                Res.Type = Parts[2];
-
-                return Res;
             }
-            catch { }
 
-            return null;
+            public static Vec3 FromVector(Vector3 vec)
+            {
+                return new Vec3() { X = vec.x, Y = vec.y, Z = vec.z };
+            }
+
+            public Vector3 GetVector()
+            {
+                return new Vector3(X, Y, Z);
+            }
         }
+
     }
 }
