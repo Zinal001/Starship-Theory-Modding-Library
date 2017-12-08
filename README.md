@@ -10,7 +10,7 @@ The library written in C# (.NET Framework 3.5).
 
 This library contains all the functions available for modding Starship Theory.
 
-*Extend the __AbstractMod__ class to create your own mod*
+*Extend the __Mod__ class to create your own mod*
 
 #### StarshipTheory.PatchInjector
 A small program to inject the modding library into the game itself.
