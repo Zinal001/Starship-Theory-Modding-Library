@@ -5,7 +5,7 @@
 
 The files listed below is usually found in SST's installation directory under StarshipTheory_Data\Managed\.
 
-*Note: The game should already have been patched by [Patch Injector](https://github.com/Zinal001/Starship-Theory-Modding-Library/tree/master/StarshipTheory.PatchInjector/StarshipTheory.PatchInjector) before referencing them.*
+*Note: The game should already have been patched by [Patch Injector](https://github.com/Zinal001/Starship-Theory-Modding-Library/tree/master/StarshipTheory.PatchInjector/StarshipTheory.PatchInjector) before copying/referencing them.*
 
 *Do __not__ include these files when you export your mod!*
 * Assembly-CSharp.dll
