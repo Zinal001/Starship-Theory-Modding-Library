@@ -217,7 +217,7 @@ namespace StarshipTheory.ModLib
                 _debugWindow.Items.Add(closeDebugBtn);
 
                 if(_errorBeforeLoad.Count > 0)
-                    ShowError(_errorBeforeLoad[0].ModName, _errorBeforeLoad[0].ModVersion, _errorBeforeLoad[0].Error, _errorBeforeLoad[0].where);
+                    ShowError(_errorBeforeLoad[0].ModName, _errorBeforeLoad[0].ModVersion, _errorBeforeLoad[0].Error, _errorBeforeLoad[0].Where);
 
             }
 
@@ -289,7 +289,7 @@ namespace StarshipTheory.ModLib
         {
             if (_debugWindow == null)
             {
-                _errorBeforeLoad.Add(new ExceptionInfo() { ModName = modName, ModVersion = modVersion, Error = error, where = where });
+                _errorBeforeLoad.Add(new ExceptionInfo() { ModName = modName, ModVersion = modVersion, Error = error, Where = where });
                 return;
             }
 
@@ -368,7 +368,7 @@ namespace StarshipTheory.ModLib
             public String ModName { get; set; }
             public String ModVersion { get; set; }
             public Exception Error { get; set; }
-            public String where { get; set; }
+            public String Where { get; set; }
         }
 
     }
