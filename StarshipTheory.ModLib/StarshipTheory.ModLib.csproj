@@ -91,8 +91,5 @@
     <Compile Include="Resources\Costs.cs" />
     <Compile Include="Resources\EntityCost.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
