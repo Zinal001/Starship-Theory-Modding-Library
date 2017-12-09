@@ -1,0 +1,9 @@
+﻿{
+  "Name": "ExporterImporter",
+  "DisplayName": "Exporter/Importer",
+  "Version": "1.0.0",
+  "Description": "Export/Import ship design",
+  "Author": "Zinal",
+  "EntryDLL": "ExporterImporter.Mod.dll",
+  "Dependencies": []
+}
