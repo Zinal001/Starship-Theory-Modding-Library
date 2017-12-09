@@ -8,6 +8,7 @@ The files listed below is usually found in SST's installation directory under St
 *Note: The game should already have been patched by [Patch Injector](https://github.com/Zinal001/Starship-Theory-Modding-Library/tree/master/StarshipTheory.PatchInjector/StarshipTheory.PatchInjector) before copying/referencing them.*
 
 *Do __not__ include these files when you export your mod!*
+*These files are integral to running SST, so everyone should already have them if they have SST installed.*
 * Assembly-CSharp.dll
 * Assembly-CSharp-firstpass.dll
 * ES2.dll
