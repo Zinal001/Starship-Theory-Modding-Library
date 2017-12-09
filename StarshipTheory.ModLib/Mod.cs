@@ -33,6 +33,16 @@ namespace StarshipTheory.ModLib
         /// </summary>
         public bool CanShowModWindow { get; set; } = true;
 
+
+        internal UnityEngine.Logger _Logger;
+        /// <summary>
+        /// 
+        /// </summary>
+        protected UnityEngine.Logger Logger
+        {
+            get { return _Logger; }
+        }
+
         internal bool _FirstGuiPassCalled = false;
 
         public Mod()

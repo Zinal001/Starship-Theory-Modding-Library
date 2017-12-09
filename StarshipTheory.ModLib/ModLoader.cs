@@ -120,6 +120,7 @@ namespace StarshipTheory.ModLib
                                 {
                                     M.Info = modInfo;
                                     M.ModFolder = modDir.FullName;
+                                    M._Logger = new UnityEngine.Logger(new ModLoggerHandler(M));
                                     PreliminaryMods.Add(M);
                                     ModTypeFound = true;
                                 }
