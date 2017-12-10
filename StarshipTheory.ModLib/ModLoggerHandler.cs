@@ -35,7 +35,7 @@ namespace StarshipTheory.ModLib
                 {
                     String contextName = context == null ? "" : (context.name + " ");
 
-                    writer.WriteLine(String.Format("[{0}] {1} {2}", logType.ToString(), contextName, String.Format(format, args)));
+                    writer.WriteLine(String.Format("[{0}]{1} {2}", logType.ToString(), contextName, String.Format(format, args)));
                 }
             }
 
