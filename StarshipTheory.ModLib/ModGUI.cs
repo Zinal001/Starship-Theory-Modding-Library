@@ -81,7 +81,7 @@ namespace StarshipTheory.ModLib
                 catch (Exception ex)
                 {
                     ModLoader.Instance.ShowError(M, ex, "GUI");
-                    UnityEngine.Debug.LogError(ex);
+                    M._Logger.LogException(ex);
                 }
             }
 

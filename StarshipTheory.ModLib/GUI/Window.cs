@@ -99,20 +99,17 @@ namespace StarshipTheory.ModLib.GUI
         {
             List<GUILayoutOption> _Options = new List<GUILayoutOption>();
 
-            if(this.IsResizeable)
-            {
-                if (MinWidth.HasValue)
-                    _Options.Add(GUILayout.MinWidth(MinWidth.Value));
+            if (MinWidth.HasValue)
+                _Options.Add(GUILayout.MinWidth(MinWidth.Value));
 
-                if (MaxWidth.HasValue)
-                    _Options.Add(GUILayout.MaxWidth(MaxWidth.Value));
+            if (MaxWidth.HasValue)
+                _Options.Add(GUILayout.MaxWidth(MaxWidth.Value));
 
-                if (MinHeight.HasValue)
-                    _Options.Add(GUILayout.MinHeight(MinHeight.Value));
+            if (MinHeight.HasValue)
+                _Options.Add(GUILayout.MinHeight(MinHeight.Value));
 
-                if (MaxHeight.HasValue)
-                    _Options.Add(GUILayout.MaxHeight(MaxHeight.Value));
-            }
+            if (MaxHeight.HasValue)
+                _Options.Add(GUILayout.MaxHeight(MaxHeight.Value));
 
             this.Options = _Options.ToArray();
 

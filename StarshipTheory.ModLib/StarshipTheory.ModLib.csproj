@@ -87,12 +87,12 @@
     <Compile Include="ModGUI.cs" />
     <Compile Include="ModInfo.cs" />
     <Compile Include="ModLoader.cs" />
+    <Compile Include="ModLoggerHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Costs.cs" />
     <Compile Include="Resources\EntityCost.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <Compile Include="Util\TilesUtil.cs" />
+    <Compile Include="Util\WaitForRealSeconds.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

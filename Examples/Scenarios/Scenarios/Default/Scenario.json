@@ -1,0 +1,243 @@
+﻿{
+  "Name": "Default",
+  "Description": "The default game scenario.",
+  "ThumbnailFile": "DefaultPNG.png",
+
+  "Ship": {
+    "Name": "DefaultShip",
+    "Design": [
+      {
+        "X": 55,
+        "Y": 68,
+        "Rotation": "UP",
+        "TileType": "HullCorner",
+        "StructureParts": [
+          {
+            "X": 55,
+            "Y": 68,
+            "Z": 0
+          }
+        ]
+      },
+      {
+        "X": 56,
+        "Y": 68,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 57,
+        "Y": 68,
+        "Rotation": "RIGHT",
+        "TileType": "HullCorner",
+        "StructureParts": [
+          {
+            "X": 57,
+            "Y": 68,
+            "Z": 1
+          }
+        ]
+      },
+      {
+        "X": 55,
+        "Y": 67,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 55,
+        "Y": 66,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 55,
+        "Y": 65,
+        "Rotation": "UP",
+        "TileType": "Airlock",
+        "StructureParts": [
+          {
+            "X": 55,
+            "Y": 65,
+            "Z": 0
+          }
+        ]
+      },
+      {
+        "X": 55,
+        "Y": 65,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 55,
+        "Y": 64,
+        "Rotation": "UP",
+        "TileType": "CargoRack",
+        "StructureParts": [
+          {
+            "X": 55,
+            "Y": 64,
+            "Z": 0
+          }
+        ]
+      },
+      {
+        "X": 55,
+        "Y": 64,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 56,
+        "Y": 64,
+        "Rotation": "DOWN",
+        "TileType": "MiniEngine",
+        "StructureParts": [
+          {
+            "X": 56,
+            "Y": 64,
+            "Z": 2
+          },
+          {
+            "X": 56,
+            "Y": 63,
+            "Z": 2
+          }
+        ]
+      },
+      {
+        "X": 56,
+        "Y": 64,
+        "Rotation": "DOWN",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 57,
+        "Y": 67,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 57,
+        "Y": 66,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 57,
+        "Y": 65,
+        "Rotation": "UP",
+        "TileType": "SSolar",
+        "StructureParts": [
+          {
+            "X": 57,
+            "Y": 65,
+            "Z": 0
+          }
+        ]
+      },
+      {
+        "X": 57,
+        "Y": 65,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 57,
+        "Y": 64,
+        "Rotation": "UP",
+        "TileType": "CPUPanel",
+        "StructureParts": [
+          {
+            "X": 57,
+            "Y": 64,
+            "Z": 0
+          }
+        ]
+      },
+      {
+        "X": 57,
+        "Y": 64,
+        "Rotation": "UP",
+        "TileType": "Hull",
+        "StructureParts": []
+      },
+      {
+        "X": 56,
+        "Y": 66,
+        "Rotation": "UP",
+        "TileType": "Floor",
+        "StructureParts": []
+      },
+      {
+        "X": 56,
+        "Y": 67,
+        "Rotation": "UP",
+        "TileType": "ShipCore",
+        "StructureParts": [
+          {
+            "X": 56,
+            "Y": 67,
+            "Z": 0
+          }
+        ]
+      },
+      {
+        "X": 56,
+        "Y": 67,
+        "Rotation": "UP",
+        "TileType": "Floor",
+        "StructureParts": []
+      },
+      {
+        "X": 56,
+        "Y": 65,
+        "Rotation": "UP",
+        "TileType": "Floor",
+        "StructureParts": []
+      }
+    ],
+    "Crew": [
+      {
+        "Name": "First",
+        "Gender": "Male",
+        "Agility": 4,
+        "Endurance": 4,
+        "Engineering": 4,
+        "Intelligence": 4,
+        "Combat": 4
+      },
+      {
+        "Name": "Second",
+        "Gender": "Female"
+      },
+      {
+        "Name": "Third",
+        "Gender": "Male"
+      },
+      {
+        "Name": "Fourth",
+        "Gender": "Female"
+      }
+    ],
+    "Cargo": {
+      "CargoSpace": 110,
+      "Credits": 400,
+      "Metal": 65,
+      "Gold": 5,
+      "Silicon": 15,
+      "Water": 15,
+      "Food": 10
+    }
+  }
+}
