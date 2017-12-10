@@ -69,7 +69,7 @@ namespace StarshipTheory.ModLib.GUI
 
             if(this.DisabledStyle == null)
             {
-                this.DisabledStyle = this.Style;
+                this.DisabledStyle = new UnityEngine.GUIStyle(this.Style);
                 this.DisabledStyle.normal.textColor = UnityEngine.Color.grey;
                 this.DisabledStyle.onNormal.textColor = UnityEngine.Color.grey;
             }
