@@ -81,8 +81,10 @@ namespace StarshipTheory.PatchInjector
                 btnPatch.IsEnabled = false;
                 btnPatch.Content = "Patching...";
 
-                System.Threading.Thread T = new System.Threading.Thread(new System.Threading.ThreadStart(Patch));
-                T.Name = "PatchInjector - Worker Thread";
+                System.Threading.Thread T = new System.Threading.Thread(new System.Threading.ThreadStart(Patch))
+                {
+                    Name = "PatchInjector - Worker Thread"
+                };
                 T.Start();
             }
         }

@@ -74,11 +74,6 @@
       <Name>StarshipTheory.ModLib</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\ExporterImporter.Mod\ExporterImporter.Mod.csproj">
-      <Project>{b329fb3e-8771-455b-a4b4-192374453962}</Project>
-      <Name>ExporterImporter.Mod</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Mod.json">

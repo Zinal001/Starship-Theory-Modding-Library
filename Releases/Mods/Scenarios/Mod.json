@@ -5,10 +5,5 @@
   "Description": "Start the game with a custom scenario!",
   "Author": "Zinal",
   "EntryDLL": "Scenarios.dll",
-  "Dependencies": [
-    {
-      "Name": "ExporterImporter",
-      "MinimumVersion":  "1.0.0"
-    }
-  ]
+  "Dependencies": []
 }

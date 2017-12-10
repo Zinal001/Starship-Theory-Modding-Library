@@ -8,6 +8,7 @@ namespace StarshipTheory.ModLib
     public sealed class ModGUI : UnityEngine.MonoBehaviour
     {
         private static UnityEngine.GUISkin _DefaultSkin = null;
+        public static UnityEngine.GUIStyle TrasparentGUIStyle { get; private set; }
 
         private static int _WindowIndex = -1;
 
@@ -28,6 +29,18 @@ namespace StarshipTheory.ModLib
         {
             get { return _tick; }
             private set { _tick = value; }
+        }
+
+        private static List<GUI.IResizeable> _ResizeHandles = new List<GUI.IResizeable>();
+
+        public static void RegisterResize(GUI.IResizeable resizeable)
+        {
+            _ResizeHandles.Add(resizeable);
+        }
+
+        public static void UnregisterResize(GUI.IResizeable resizeable)
+        {
+            _ResizeHandles.Remove(resizeable);
         }
 
 
@@ -51,6 +64,21 @@ namespace StarshipTheory.ModLib
         /// </summary>
         void OnGUI()
         {
+
+            if (TrasparentGUIStyle == null)
+            {
+                UnityEngine.Texture2D emptyText = InternalResources.ReadResourceAsTexture2D("Transparent");
+
+                TrasparentGUIStyle = new UnityEngine.GUIStyle();
+                TrasparentGUIStyle.active.background = emptyText;
+                TrasparentGUIStyle.hover.background = emptyText;
+                TrasparentGUIStyle.normal.background = emptyText;
+                TrasparentGUIStyle.onActive.background = emptyText;
+                TrasparentGUIStyle.onFocused.background = emptyText;
+                TrasparentGUIStyle.onHover.background = emptyText;
+                TrasparentGUIStyle.onNormal.background = emptyText;
+            }
+
             if (_tick > 100000)
                 _tick = 0;
 
@@ -62,6 +90,21 @@ namespace StarshipTheory.ModLib
 
             ModLoader.Instance.__OnGui();
             _tick++;
+
+            if(_ResizeHandles.Count > 0)
+            {
+                UnityEngine.GUI.Box(new UnityEngine.Rect(0, 0, UnityEngine.Screen.width, UnityEngine.Screen.height), "", TrasparentGUIStyle);
+
+                if ((UnityEngine.Event.current.type == UnityEngine.EventType.mouseUp && UnityEngine.Event.current.button == 0))
+                {
+                    GUI.IResizeable[] resizeables = new GUI.IResizeable[_ResizeHandles.Count];
+                    _ResizeHandles.CopyTo(resizeables, 0);
+
+                    foreach (GUI.IResizeable resizeable in resizeables)
+                        resizeable.ResizeEnd(UnityEngine.Event.current.mousePosition);
+                }
+
+            }
 
             foreach (Mod M in ModLoader.Instance.Mods.Where(m => m.Enabled))
             {

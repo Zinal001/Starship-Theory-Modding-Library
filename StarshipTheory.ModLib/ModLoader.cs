@@ -335,10 +335,8 @@ namespace StarshipTheory.ModLib
 
             if(ex is TypeLoadException)
                 str += indent + "<b>Type Name:</b> " + ((TypeLoadException)ex).TypeName + "\n";
-            else if(ex is System.Reflection.ReflectionTypeLoadException)
+            else if (ex is System.Reflection.ReflectionTypeLoadException rex)
             {
-                System.Reflection.ReflectionTypeLoadException rex = (System.Reflection.ReflectionTypeLoadException)ex;
-
                 if (rex == null)
                     str += indent + "<b><color=yellow>REFLECTION TYPE LOAD FAILED</color></b>";
                 else
@@ -348,7 +346,7 @@ namespace StarshipTheory.ModLib
                         str += indent + "<b>Loader exceptions:</b>\n";
                         foreach (Exception subEx in rex.LoaderExceptions)
                         {
-                            if(subEx != null)
+                            if (subEx != null)
                                 str += ExceptionToMessage(subEx, indentC + 1);
                         }
                     }
