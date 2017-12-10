@@ -6,10 +6,12 @@ using UnityEngine;
 
 namespace StarshipTheory.ModLib
 {
-    public class ModLoggerHandler : ILogHandler
+    public class ModLoggerHandler : ILogHandler, IDisposable
     {
         private System.Object _loggerLock;
         private String logFile;
+
+        private System.IO.StreamWriter _Writer = null;
 
         /// <summary>
         /// Should this logger also output to the global output_log.txt file?
@@ -31,12 +33,14 @@ namespace StarshipTheory.ModLib
         {
             lock(_loggerLock)
             {
-                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(this.logFile))
+                if(_Writer == null)
                 {
-                    String contextName = context == null ? "" : (context.name + " ");
-
-                    writer.WriteLine(String.Format("[{0}]{1} {2}", logType.ToString(), contextName, String.Format(format, args)));
+                    _Writer = new System.IO.StreamWriter(this.logFile, false, Encoding.UTF8);
                 }
+
+                String contextName = context == null ? "" : (context.name + " ");
+
+                _Writer.WriteLine(String.Format("[{0}]{1} {2}", logType.ToString(), contextName, String.Format(format, args)));
             }
 
             if (OutputToGlobal)
@@ -91,6 +95,15 @@ namespace StarshipTheory.ModLib
             }
 
             return str;
+        }
+
+        void IDisposable.Dispose()
+        {
+            if (_Writer != null)
+            {
+                _Writer.Dispose();
+                _Writer = null;
+            }
         }
     }
 }
