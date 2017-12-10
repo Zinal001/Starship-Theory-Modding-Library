@@ -91,6 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Costs.cs" />
     <Compile Include="Resources\EntityCost.cs" />
+    <Compile Include="Util\TilesUtil.cs" />
     <Compile Include="Util\WaitForRealSeconds.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

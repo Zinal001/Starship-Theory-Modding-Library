@@ -3,6 +3,7 @@ using System.Text;
 using StarshipTheory.ModLib;
 using GUI = StarshipTheory.ModLib.GUI;
 using Events = StarshipTheory.ModLib.Events;
+using Utils = StarshipTheory.ModLib.Util;
 using UnityEngine;
 using System.Collections.Generic;
 

@@ -34,9 +34,7 @@ namespace StarshipTheory.ModLib
             lock(_loggerLock)
             {
                 if(_Writer == null)
-                {
-                    _Writer = new System.IO.StreamWriter(this.logFile, false, Encoding.UTF8);
-                }
+                    _Writer = new System.IO.StreamWriter(this.logFile, false, Encoding.UTF8) { AutoFlush = true };
 
                 String contextName = context == null ? "" : (context.name + " ");
 
