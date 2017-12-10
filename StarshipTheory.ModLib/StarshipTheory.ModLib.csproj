@@ -44,6 +44,7 @@
     </Reference>
     <Reference Include="Pathfinding.JsonFx">
       <HintPath>..\RequiredFiles\Pathfinding.JsonFx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
