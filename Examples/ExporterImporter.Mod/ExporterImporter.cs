@@ -118,7 +118,6 @@ namespace ExporterImporter.Mod
                         shipTiles.tiles[td.X, td.Y].leakValue = 0;
                         shipStructures.stopLeakSource(td.X, td.Y);
                         shipStructures.updateLeakBalance1(td.X, td.Y);
-                        shipStructures.powerStructure(td.X, td.Y, td.TileType, true, "ExporterImporter.OnImportFinished");
                     }
 
                     break;

@@ -177,16 +177,22 @@ namespace StarshipTheory.ModLib.Util
             completed?.Invoke(null);
         }
 
-        public static void Import(TileData[] tiles, Action<Exception> completed)
+        public static void Import(TileData[] tiles, Action<Exception> completed, bool pauseGame = true)
         {
-            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_ImportCR(tiles, completed));
+            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_ImportCR(tiles, completed, pauseGame));
         }
 
-        private static System.Collections.IEnumerator _ImportCR(TileData[] tiles, Action<Exception> completed)
+        private static System.Collections.IEnumerator _ImportCR(TileData[] tiles, Action<Exception> completed, bool pauseGame)
         {
             GameObject tileMap = GameObject.Find("TileMap");
             Tiles shipTiles = tileMap.GetComponent<Tiles>();
             Structures shipStructures = tileMap.GetComponent<Structures>();
+
+            if(pauseGame)
+                GameObject.Find("Manager").GetComponent<ManagerOptions>().pauseGame("Pause");
+
+            bool checkForLeaks = shipStructures.checkForLeaks;
+            shipStructures.checkForLeaks = false;
 
             List<TileData> hull = new List<TileData>();
             List<TileData> floor = new List<TileData>();
@@ -302,6 +308,13 @@ namespace StarshipTheory.ModLib.Util
                 }
 
                 yield return new WaitForRealSeconds(0.01f);
+
+                shipStructures.checkForLeaks = checkForLeaks;
+
+                if (pauseGame)
+                    GameObject.Find("Manager").GetComponent<ManagerOptions>().pauseGame("Play");
+
+
                 completed?.Invoke(null);
                 yield break;
             }
