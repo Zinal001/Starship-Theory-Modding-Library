@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="GUI\IResizeable.cs" />
     <Compile Include="GUI\ResizeHandle.cs" />
+    <Compile Include="GUI\WindowButton.cs" />
     <Compile Include="InternalResources.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Data\ES2_UserType_CostSaveData.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="GUI\Label.cs" />
     <Compile Include="GUI\PasswordField.cs" />
     <Compile Include="GUI\RepeatButton.cs" />
-    <Compile Include="GUI\ResizeWindow.cs" />
     <Compile Include="GUI\Scrollbar.cs" />
     <Compile Include="GUI\ScrollView.cs" />
     <Compile Include="GUI\SelectionGrid.cs" />
@@ -115,6 +115,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Transparent.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CloseButton.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -63,6 +63,16 @@ namespace StarshipTheory.ModLib.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] CloseButton {
+            get {
+                object obj = ResourceManager.GetObject("CloseButton", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] ResizeHandle {
             get {
                 object obj = ResourceManager.GetObject("ResizeHandle", resourceCulture);

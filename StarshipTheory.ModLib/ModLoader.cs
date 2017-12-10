@@ -251,25 +251,8 @@ namespace StarshipTheory.ModLib
             _ShowModList = !_ShowModList;
             if (_ShowModList)
             {
-                float MaxWidth = 0;
                 foreach (GUI.Button modbtn in _ModListButtonArea.Items)
-                {
                     modbtn.Visible = true;
-
-                    UnityEngine.Vector2 size;
-
-                    if (modbtn.Style != null)
-                        size = modbtn.Style.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
-                    else
-                        size = UnityEngine.GUI.skin.button.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
-
-                    UnityEngine.Debug.Log(modbtn.Text + ": " + size.x + ", " + size.y);
-
-                    if (size.x > MaxWidth)
-                        MaxWidth = size.x;
-                }
-
-                _ModListButtonArea.Size = new UnityEngine.Rect((float)UnityEngine.Screen.width - MaxWidth, 0, MaxWidth, (float)UnityEngine.Screen.height);
             }
             else
             {

@@ -12,11 +12,6 @@ namespace StarshipTheory.ModLib.GUI
     /// </summary>
     public class Window : GUIItem, IGroupItem
     {
-        /* TODO: Fix Window Resizing
-         * 
-         * 
-         */
-
         /// <summary>
         /// A unique Index to use for each window. This is the Index you'll use to interface to it.
         /// <see cref="StarshipTheory.ModLib.ModGUI.GetWindowIndex"></see>
@@ -55,9 +50,17 @@ namespace StarshipTheory.ModLib.GUI
         /// </summary>
         public bool IsResizeable { get; set; }
 
+        /// <summary>
+        /// Should the Window have a close button?
+        /// </summary>
+        public bool IsCloseable { get; set; }
+
         private ResizeHandle _ResizeHandle;
+        private WindowButton _CloseBtn;
 
         private UnityEngine.GUI.WindowFunction _OnDrawFunc = null;
+
+        public event GUIEvent WindowClosed;
 
 
         /// <summary>
@@ -141,17 +144,11 @@ namespace StarshipTheory.ModLib.GUI
                 if (OverrideRect.HasValue)
                 {
                     Rect = new Rect(OverrideRect.Value.position, OverrideRect.Value.size);
-                    Debug.Log("Overriding window with " + OverrideRect.Value.width + ", " + OverrideRect.Value.height);
                     OverrideRect = null;
                 }
 
                 Rect = GUILayout.Window(Index, Rect, _OnDrawFunc, new GUIContent(Title, Image, Tooltip), Style, Options);
             }
-        }
-
-        private void CloseBtn_Clicked(GUIItem item)
-        {
-            this.Visible = false;
         }
 
         private void _OnDraw(int windowIndex)
@@ -160,8 +157,6 @@ namespace StarshipTheory.ModLib.GUI
             {
                 if (this.Visible)
                 {
-                    if (IsDraggable)
-                        UnityEngine.GUI.DragWindow(new Rect(0, 0, Rect.width, 20));
 
                     foreach (GUIItem Item in Items)
                     {
@@ -177,12 +172,38 @@ namespace StarshipTheory.ModLib.GUI
                         _ResizeHandle.Draw();
                     }
 
+                    if(IsCloseable)
+                    {
+                        if(_CloseBtn == null)
+                        {
+                            _CloseBtn = new WindowButton(this, "CloseButton", new Vector2(Rect.width - 15, 5));
+                            _CloseBtn.MouseDown += _CloseBtn_Clicked;
+                        }
+
+                        _CloseBtn.PositionOffset = new Vector2(Rect.width - 15, 5);
+                        _CloseBtn.Draw();
+                    }
+
+                    if (IsDraggable)
+                        UnityEngine.GUI.DragWindow(new Rect(0, 0, Rect.width, 20));
                 }
             }
             catch(Exception ex)
             {
                 ModLoader.Instance.ShowError(_drawingMod, ex, "OnGUI");
             }
+        }
+
+        private void _CloseBtn_Clicked(GUIItem item, int button, Vector2 position)
+        {
+            if (button == 0)
+                Close();
+        }
+
+        public void Close()
+        {
+            this.Visible = false;
+            WindowClosed?.Invoke(this);
         }
     }
 }

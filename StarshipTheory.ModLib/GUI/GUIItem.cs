@@ -79,6 +79,15 @@ namespace StarshipTheory.ModLib.GUI
 
         protected static int GroupDepth = 0;
 
+        protected void Trigger_MouseDown(int button, UnityEngine.Vector2 position)
+        {
+            MouseDown?.Invoke(this, button, position);
+        }
+
+        protected void Trigger_MouseUp(int button, UnityEngine.Vector2 position)
+        {
+            MouseUp?.Invoke(this, button, position);
+        }
 
         internal Mod _drawingMod = null;
 
@@ -141,5 +150,6 @@ namespace StarshipTheory.ModLib.GUI
         }
     }
 
+    public delegate void GUIEvent(GUIItem item);
     public delegate void GUIMouseEvent(GUIItem item, int button, UnityEngine.Vector2 position);
 }

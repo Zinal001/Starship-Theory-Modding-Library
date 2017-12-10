@@ -225,13 +225,16 @@ namespace Scenarios
             _SelectedScenario = null;
 
             _ScenarioWindow = new GUI.Window(ModGUI.GetWindowIndex(), "Scenarios") {
-                IsDraggable = false,
-                IsResizeable = false,
+                IsDraggable = true,
+                IsResizeable = true,
+                IsCloseable = true,
                 Rect = new Rect((Screen.width / 2) - 200, (Screen.height / 2) - 200, 400, 400),
                 Visible = false,
                 MinWidth = 200,
                 MinHeight = 200
             };
+
+            _ScenarioWindow.WindowClosed += _ScenarioWindow_WindowClosed;
 
             GUI.Group group = new GUI.Group(GUI.GUIItem.Direction.Vertical);
             _ScenarioWindow.Items.Add(group);
@@ -287,6 +290,11 @@ namespace Scenarios
             _LoadBtn = new GUI.Button("Load") { IsEnabled = false };
             _LoadBtn.Clicked += LoadBtn_Clicked;
             btnGroup.Items.Add(_LoadBtn);
+        }
+
+        private void _ScenarioWindow_WindowClosed(GUI.GUIItem item)
+        {
+            mainMenuRight.SetActive(true);
         }
 
         private void CancelBtn_Clicked(GUI.GUIItem item)
