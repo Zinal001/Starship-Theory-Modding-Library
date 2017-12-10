@@ -22,9 +22,22 @@ namespace StarshipTheory.ModLib.GUI
         public String Text { get; set; }
 
         /// <summary>
+        /// <para>Can this button be clicked?</para>
+        /// <para>Defaults to true</para>
+        /// </summary>
+        public bool IsEnabled { get; set; } = true;
+
+        /// <summary>
+        /// The style that the button should use when disabled.
+        /// </summary>
+        public UnityEngine.GUIStyle DisabledStyle { get; set; }
+
+        /// <summary>
         /// Called when this button is clicked.
         /// </summary>
         public event ButtonEventDelegate Clicked;
+
+
 
         /// <summary>
         /// Creates a new Button
@@ -54,10 +67,20 @@ namespace StarshipTheory.ModLib.GUI
             if (this.Style == null)
                 this.Style = UnityEngine.GUI.skin.button;
 
+            if(this.DisabledStyle == null)
+            {
+                this.DisabledStyle = this.Style;
+                this.DisabledStyle.normal.textColor = UnityEngine.Color.grey;
+                this.DisabledStyle.onNormal.textColor = UnityEngine.Color.grey;
+            }
+
             if (this.Visible)
             {
-                if (UnityEngine.GUILayout.Button(new UnityEngine.GUIContent(Text, Image, this.Tooltip), Style, this.Options))
-                    Clicked?.Invoke(this);
+                if (UnityEngine.GUILayout.Button(new UnityEngine.GUIContent(Text, Image, this.Tooltip), this.IsEnabled ? Style : DisabledStyle, this.Options))
+                {
+                    if(this.IsEnabled)
+                        Clicked?.Invoke(this);
+                }
             }
         }
     }
