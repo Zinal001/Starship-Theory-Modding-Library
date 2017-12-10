@@ -214,7 +214,7 @@ namespace Scenarios
         private System.Collections.IEnumerator CheckMainMenuMode()
         {
             while(_ScenarioWindow.Visible && (ManagerMenu.mainMenuMode == null || ManagerMenu.mainMenuMode == "" || ManagerMenu.mainMenuMode == "Base" || ManagerMenu.mainMenuMode == "New"))
-                yield return new StarshipTheory.ModLib.Util.WaitForRealSeconds(0.5f);
+                yield return new WaitForRealSeconds(0.5f);
 
             _ScenarioWindow.Visible = false;
             mainMenuRight.SetActive(true);
@@ -244,8 +244,10 @@ namespace Scenarios
             
             foreach(Scenario scenario in Scenarios)
             {
-                GUI.Button btn = new GUI.Button(scenario.Name);
-                btn.Tag = scenario;
+                GUI.Button btn = new GUI.Button(scenario.Name)
+                {
+                    Tag = scenario
+                };
                 btn.Clicked += ScenarioBtn_Clicked;
                 lstScenarios.Items.Add(btn);
             }
