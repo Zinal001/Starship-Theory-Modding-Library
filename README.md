@@ -15,7 +15,7 @@ This library contains all the functions available for modding Starship Theory.
 #### StarshipTheory.PatchInjector
 A small program to inject the modding library into the game itself.
 
-Download and extract the [latest release](https://github.com/Zinal001/Starship-Theory-Modding-Library/blob/master/Releases/Alpha%200.0.2.zip) to patch the game to allow mods to be injected into the game.
+Download and extract the [latest release](https://github.com/Zinal001/Starship-Theory-Modding-Library/blob/master/Releases/Alpha%200.0.3.zip) to patch the game to allow mods to be injected into the game.
 
 #### Examples
 A few example mods.
