@@ -12,11 +12,6 @@ namespace StarshipTheory.ModLib.GUI
     /// </summary>
     public class Window : GUIItem, IGroupItem
     {
-        /* TODO: Fix Window Resizing
-         * 
-         * 
-         */
-
         /// <summary>
         /// A unique Index to use for each window. This is the Index you'll use to interface to it.
         /// <see cref="StarshipTheory.ModLib.ModGUI.GetWindowIndex"></see>
@@ -43,6 +38,8 @@ namespace StarshipTheory.ModLib.GUI
         /// </summary>
         public Rect Rect { get; set; } = new Rect(0, 0, 200, 20);
 
+        private Rect? OverrideRect = null;
+
         /// <summary>
         /// Is this Window draggable?
         /// </summary>
@@ -53,18 +50,17 @@ namespace StarshipTheory.ModLib.GUI
         /// </summary>
         public bool IsResizeable { get; set; }
 
-        private Vector2? _ResizeStart = null;
+        /// <summary>
+        /// Should the Window have a close button?
+        /// </summary>
+        public bool IsCloseable { get; set; }
 
-        private Area _WindowArea;
-        private Group TitleGroup;
-        private Label _TitleLabel;
-        private ScrollView _BodyView;
-
-        private Space leftSpacer;
-        private Space rightSpacer;
-        private Space bottomSpacer;
+        private ResizeHandle _ResizeHandle;
+        private WindowButton _CloseBtn;
 
         private UnityEngine.GUI.WindowFunction _OnDrawFunc = null;
+
+        public event GUIEvent WindowClosed;
 
 
         /// <summary>
@@ -95,24 +91,40 @@ namespace StarshipTheory.ModLib.GUI
         /// <param name="image">Texture to display an image in the titlebar.</param>
         public Window(int windowIndex, Texture image) : this(windowIndex, "", image) { }
 
+        public void Resize(float width, float height)
+        {
+            float minW = MinWidth ?? 0;
+            float maxW = MaxWidth ?? Screen.width;
+            float minH = MinHeight ?? 0;
+            float maxH = MaxHeight ?? Screen.height;
+
+            if (width < minW)
+                width = minW;
+            if (width > maxW)
+                width = maxW;
+            if (height < minH)
+                height = minH;
+            if (height > maxH)
+                height = maxH;
+
+            this.OverrideRect = new Rect(Rect.x, Rect.y, width, height);
+        }
+
         internal override void __Draw()
         {
             List<GUILayoutOption> _Options = new List<GUILayoutOption>();
 
-            if(this.IsResizeable)
-            {
-                if (MinWidth.HasValue)
-                    _Options.Add(GUILayout.MinWidth(MinWidth.Value));
+            if (MinWidth.HasValue)
+                _Options.Add(GUILayout.MinWidth(MinWidth.Value));
 
-                if (MaxWidth.HasValue)
-                    _Options.Add(GUILayout.MaxWidth(MaxWidth.Value));
+            if (MaxWidth.HasValue)
+                _Options.Add(GUILayout.MaxWidth(MaxWidth.Value));
 
-                if (MinHeight.HasValue)
-                    _Options.Add(GUILayout.MinHeight(MinHeight.Value));
+            if (MinHeight.HasValue)
+                _Options.Add(GUILayout.MinHeight(MinHeight.Value));
 
-                if (MaxHeight.HasValue)
-                    _Options.Add(GUILayout.MaxHeight(MaxHeight.Value));
-            }
+            if (MaxHeight.HasValue)
+                _Options.Add(GUILayout.MaxHeight(MaxHeight.Value));
 
             this.Options = _Options.ToArray();
 
@@ -129,88 +141,13 @@ namespace StarshipTheory.ModLib.GUI
                 if (_OnDrawFunc == null)
                     _OnDrawFunc = new UnityEngine.GUI.WindowFunction(_OnDraw);
 
+                if (OverrideRect.HasValue)
+                {
+                    Rect = new Rect(OverrideRect.Value.position, OverrideRect.Value.size);
+                    OverrideRect = null;
+                }
+
                 Rect = GUILayout.Window(Index, Rect, _OnDrawFunc, new GUIContent(Title, Image, Tooltip), Style, Options);
-            }
-        }
-
-        private void __CreateWindowComponents()
-        {
-            GUIStyle titleStyle = new GUIStyle(UnityEngine.GUI.skin.label)
-            {
-                fontStyle = FontStyle.Bold,
-                wordWrap = false
-            };
-
-            Area windowArea = new Area(Rect);
-
-            Group titleGroup = new Group(Direction.Horizontal);
-            Label titleLable = new Label(Title) { Style = titleStyle, MinHeight = 20, MaxHeight = 20 };
-            titleGroup.Items.Add(titleLable);
-            titleGroup.Items.Add(new FlexibleSpace());
-            Button closeBtn = new Button("X");
-            closeBtn.Clicked += CloseBtn_Clicked;
-            titleGroup.Items.Add(closeBtn);
-
-            windowArea.Items.Add(titleGroup);
-            TitleGroup = titleGroup;
-
-            Group bodyGroup = new Group(Direction.Horizontal);
-            leftSpacer = new Space(5);
-            leftSpacer.MouseDown += Resize_MouseDown;
-            bodyGroup.Items.Add(leftSpacer);
-            ScrollView bodyView = new ScrollView();
-            foreach (GUIItem item in Items)
-                bodyView.Items.Add(item);
-            bodyGroup.Items.Add(bodyView);
-            rightSpacer = new Space(5);
-            rightSpacer.MouseDown += Resize_MouseDown;
-            bodyGroup.Items.Add(rightSpacer);
-
-            windowArea.Items.Add(bodyGroup);
-
-            Group footerGroup = new Group(Direction.Horizontal);
-            bottomSpacer = new Space(5);
-            bottomSpacer.MouseDown += Resize_MouseDown;
-            footerGroup.Items.Add(bottomSpacer);
-
-            windowArea.Items.Add(footerGroup);
-
-            _WindowArea = windowArea;
-            _TitleLabel = titleLable;
-            _BodyView = bodyView;
-        }
-
-        private void Resize_MouseDown(GUIItem item, int button, Vector2 position)
-        {
-            if(button == 0)
-            {
-                Debug.Log("MOUSE DOWN: " + item.GetType().Name);
-            }
-        }
-
-        private void CloseBtn_Clicked(GUIItem item)
-        {
-            this.Visible = false;
-        }
-
-        private void __OnWindow()
-        {
-            if (_WindowArea == null)
-                __CreateWindowComponents();
-
-            _TitleLabel.Text = Title;
-
-            if (this.Visible)
-            {
-                _BodyView.Items.Clear();
-                foreach (GUIItem item in Items)
-                    _BodyView.Items.Add(item);
-
-                leftSpacer.Visible = bottomSpacer.Visible = rightSpacer.Visible = IsResizeable;
-
-                GroupDepth++;
-                _WindowArea.__Draw();
-                GroupDepth--;
             }
         }
 
@@ -220,11 +157,6 @@ namespace StarshipTheory.ModLib.GUI
             {
                 if (this.Visible)
                 {
-                    if (IsDraggable)
-                        UnityEngine.GUI.DragWindow(new Rect(0, 0, Rect.width, 20));
-
-                    if (Event.current.type == EventType.MouseUp || Input.GetMouseButtonUp(0))
-                        _ResizeStart = null;
 
                     foreach (GUIItem Item in Items)
                     {
@@ -234,31 +166,26 @@ namespace StarshipTheory.ModLib.GUI
 
                     if (IsResizeable)
                     {
-                        GUILayout.Box("", GUILayout.Height(5));
-                        
-                        if (Event.current.type == EventType.MouseDown)
-                        {
-                            Rect r = GUILayoutUtility.GetLastRect();
-                            if(r.Contains(Event.current.mousePosition))
-                            {
-                                _ResizeStart = new Vector2(Event.current.mousePosition.x, Event.current.mousePosition.y);
-                            }
-                        }
+                        if (_ResizeHandle == null)
+                            _ResizeHandle = new ResizeHandle(this);
 
-                        if (_ResizeStart.HasValue)
-                        {
-                            float w = Event.current.mousePosition.x - Rect.x;
-                            if (w < 0)
-                                w = 0;
-
-                            float h = Event.current.mousePosition.y - Rect.y;
-                            if (h < 0)
-                                h = 0;
-
-                            Rect = new Rect(Rect.x, Rect.y, w, h);
-                        }
+                        _ResizeHandle.Draw();
                     }
 
+                    if(IsCloseable)
+                    {
+                        if(_CloseBtn == null)
+                        {
+                            _CloseBtn = new WindowButton(this, "CloseButton", new Vector2(Rect.width - 15, 5));
+                            _CloseBtn.MouseDown += _CloseBtn_Clicked;
+                        }
+
+                        _CloseBtn.PositionOffset = new Vector2(Rect.width - 15, 5);
+                        _CloseBtn.Draw();
+                    }
+
+                    if (IsDraggable)
+                        UnityEngine.GUI.DragWindow(new Rect(0, 0, Rect.width, 20));
                 }
             }
             catch(Exception ex)
@@ -267,59 +194,16 @@ namespace StarshipTheory.ModLib.GUI
             }
         }
 
-        bool draggingLeft = false;
-        bool draggingRight = false;
-
-        private Rect HorizResizer(Rect window, bool right = true, float detectionRange = 8f)
+        private void _CloseBtn_Clicked(GUIItem item, int button, Vector2 position)
         {
-            detectionRange *= 0.5f;
-            Rect resizer = window;
+            if (button == 0)
+                Close();
+        }
 
-            if (right)
-            {
-                resizer.xMin = resizer.xMax - detectionRange;
-                resizer.xMax += detectionRange;
-            }
-            else
-            {
-                resizer.xMax = resizer.xMin + detectionRange;
-                resizer.xMin -= detectionRange;
-            }
-
-            Event current = Event.current;
-            //EditorGUIUtility.AddCursorRect(resizer, MouseCursor.ResizeHorizontal);
-
-            // if mouse is no longer dragging, stop tracking direction of drag
-            if (current.type == EventType.MouseUp)
-            {
-                draggingLeft = false;
-                draggingRight = false;
-            }
-
-            // resize window if mouse is being dragged within resizor bounds
-            if (current.mousePosition.x > resizer.xMin &&
-                current.mousePosition.x < resizer.xMax &&
-                current.type == EventType.MouseDrag &&
-                current.button == 0 ||
-                draggingLeft ||
-                draggingRight)
-            {
-                if (right == !draggingLeft)
-                {
-                    window.width = current.mousePosition.x + current.delta.x;
-                    //Repaint();
-                    draggingRight = true;
-                }
-                else if (!right == !draggingRight)
-                {
-                    window.width = window.width - (current.mousePosition.x + current.delta.x);
-                    //Repaint();
-                    draggingLeft = true;
-                }
-
-            }
-
-            return window;
+        public void Close()
+        {
+            this.Visible = false;
+            WindowClosed?.Invoke(this);
         }
     }
 }

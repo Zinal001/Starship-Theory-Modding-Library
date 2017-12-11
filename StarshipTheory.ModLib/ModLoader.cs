@@ -76,14 +76,14 @@ namespace StarshipTheory.ModLib
         /// </summary>
         private void SetupGUI()
         {
-            _ModListButtonArea = new GUI.Area(new UnityEngine.Rect(UnityEngine.Screen.width - 100, 0, 100, UnityEngine.Screen.height)) { MaxWidth = 200, MaxHeight = 400 };
+            _ModListButtonArea = new GUI.Area(new UnityEngine.Rect(UnityEngine.Screen.width - 150, 0, 150, UnityEngine.Screen.height)) { MaxWidth = 200, MaxHeight = 400 };
             _ToggleModListBtn = new GUI.Button("Mods");
             _ToggleModListBtn.Clicked += ToggleModListBtn_Clicked;
             _ModListButtonArea.Items.Add(_ToggleModListBtn);
         }
 
         /// <summary>
-        /// Register every .Mod.dll file in the Mods directory
+        /// Register every Mod in the Mods directory
         /// </summary>
         /// <param name="ModsFolder"></param>
         private void RegisterMods(String ModsFolder)
@@ -120,6 +120,7 @@ namespace StarshipTheory.ModLib
                                 {
                                     M.Info = modInfo;
                                     M.ModFolder = modDir.FullName;
+                                    M._Logger = new UnityEngine.Logger(new ModLoggerHandler(M));
                                     PreliminaryMods.Add(M);
                                     ModTypeFound = true;
                                 }
@@ -217,7 +218,7 @@ namespace StarshipTheory.ModLib
                 _debugWindow.Items.Add(closeDebugBtn);
 
                 if(_errorBeforeLoad.Count > 0)
-                    ShowError(_errorBeforeLoad[0].modName, _errorBeforeLoad[0].modVersion, _errorBeforeLoad[0].error, _errorBeforeLoad[0].where);
+                    ShowError(_errorBeforeLoad[0].ModName, _errorBeforeLoad[0].ModVersion, _errorBeforeLoad[0].Error, _errorBeforeLoad[0].Where);
 
             }
 
@@ -242,42 +243,16 @@ namespace StarshipTheory.ModLib
         private void ModBtn_Clicked(GUI.GUIItem item)
         {
             Mod M = item.Tag as Mod;
-#if DEBUG
-            UnityEngine.Debug.Log("Toggleing window for " + M.Info.DisplayName);
-#endif
             M.ToggleModWindow();
         }
 
         private void ToggleModListBtn_Clicked(GUI.GUIItem item)
         {
             _ShowModList = !_ShowModList;
-#if DEBUG
-            UnityEngine.Debug.Log("Showing Mods: " + (_ShowModList ? "True" : "False"));
-#endif
             if (_ShowModList)
             {
-                float MaxWidth = 0;
                 foreach (GUI.Button modbtn in _ModListButtonArea.Items)
-                {
                     modbtn.Visible = true;
-
-                    UnityEngine.Vector2 size;
-
-                    if (modbtn.Style != null)
-                        size = modbtn.Style.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
-                    else
-                        size = UnityEngine.GUI.skin.button.CalcSize(new UnityEngine.GUIContent(modbtn.Text, modbtn.Image, modbtn.Tooltip));
-
-                    UnityEngine.Debug.Log(modbtn.Text + ": " + size.x + ", " + size.y);
-
-                    if (size.x > MaxWidth)
-                        MaxWidth = size.x;
-                }
-
-                _ModListButtonArea.Size = new UnityEngine.Rect((float)UnityEngine.Screen.width - MaxWidth, 0, MaxWidth, (float)UnityEngine.Screen.height);
-#if DEBUG
-                UnityEngine.Debug.Log("ModListArea: (" + _ModListButtonArea.Size.x + ", " + _ModListButtonArea.Size.y + ", " + _ModListButtonArea.Size.width + ", " + _ModListButtonArea.Size.height);
-#endif
             }
             else
             {
@@ -298,7 +273,7 @@ namespace StarshipTheory.ModLib
         {
             if (_debugWindow == null)
             {
-                _errorBeforeLoad.Add(new ExceptionInfo() { modName = modName, modVersion = modVersion, error = error, where = where });
+                _errorBeforeLoad.Add(new ExceptionInfo() { ModName = modName, ModVersion = modVersion, Error = error, Where = where });
                 return;
             }
 
@@ -343,10 +318,8 @@ namespace StarshipTheory.ModLib
 
             if(ex is TypeLoadException)
                 str += indent + "<b>Type Name:</b> " + ((TypeLoadException)ex).TypeName + "\n";
-            else if(ex is System.Reflection.ReflectionTypeLoadException)
+            else if (ex is System.Reflection.ReflectionTypeLoadException rex)
             {
-                System.Reflection.ReflectionTypeLoadException rex = (System.Reflection.ReflectionTypeLoadException)ex;
-
                 if (rex == null)
                     str += indent + "<b><color=yellow>REFLECTION TYPE LOAD FAILED</color></b>";
                 else
@@ -356,7 +329,7 @@ namespace StarshipTheory.ModLib
                         str += indent + "<b>Loader exceptions:</b>\n";
                         foreach (Exception subEx in rex.LoaderExceptions)
                         {
-                            if(subEx != null)
+                            if (subEx != null)
                                 str += ExceptionToMessage(subEx, indentC + 1);
                         }
                     }
@@ -374,10 +347,10 @@ namespace StarshipTheory.ModLib
 
         private class ExceptionInfo
         {
-            public String modName { get; set; }
-            public String modVersion { get; set; }
-            public Exception error { get; set; }
-            public String where { get; set; }
+            public String ModName { get; set; }
+            public String ModVersion { get; set; }
+            public Exception Error { get; set; }
+            public String Where { get; set; }
         }
 
     }
