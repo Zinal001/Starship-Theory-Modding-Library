@@ -64,7 +64,6 @@ namespace StarshipTheory.ModLib
         /// </summary>
         void OnGUI()
         {
-
             if (TrasparentGUIStyle == null)
             {
                 UnityEngine.Texture2D emptyText = InternalResources.ReadResourceAsTexture2D("Transparent");

@@ -68,8 +68,9 @@ namespace StarshipTheory.ModLib
 
             if (ex is TypeLoadException)
                 str += indent + "Type Name: " + ((TypeLoadException)ex).TypeName + "\n";
-            else if (ex is System.Reflection.ReflectionTypeLoadException rex)
+            else if (ex is System.Reflection.ReflectionTypeLoadException)
             {
+                System.Reflection.ReflectionTypeLoadException rex = (System.Reflection.ReflectionTypeLoadException)ex;
                 if (rex != null)
                 {
                     if (rex.LoaderExceptions != null && rex.LoaderExceptions.Length > 0)

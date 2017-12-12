@@ -9,7 +9,7 @@ namespace StarshipTheory.ModLib.GUI
     /// A wrapper class for the GUILayout.Toolbar Unity method
     /// <see>https://docs.unity3d.com/ScriptReference/GUILayout.Toolbar.html</see>
     /// </summary>
-    public class Toolbar : GUIItem
+    public class Toolbar : GUIItem, IGroupItem
     {
         /// <summary>
         /// The index of the selected button.
@@ -48,6 +48,11 @@ namespace StarshipTheory.ModLib.GUI
 
             if (this.Visible)
             {
+                if (Selected > this.Buttons.Count - 1)
+                    Selected = this.Buttons.Count - 1;
+                else if (Selected < 0)
+                    Selected = 0;
+
                 int S = UnityEngine.GUILayout.Toolbar(Selected, Buttons.ToArray(), Style, Options);
                 if (S != Selected)
                     SelectedChanged?.Invoke(this);

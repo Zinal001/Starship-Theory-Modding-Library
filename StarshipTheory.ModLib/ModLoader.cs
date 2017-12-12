@@ -266,7 +266,18 @@ namespace StarshipTheory.ModLib
 
         internal void ShowError(Mod m, Exception error, String where = "")
         {
-            ShowError(m.Info.DisplayName, m.Info.Version.ToString(), error, where);
+            if (m == null)
+                return;
+
+            if (m.Info == null)
+                return;
+
+            String version = null;
+
+            if (m.Info.Version != null)
+                version = m.Info.Version.ToString();
+
+            ShowError(m.Info.DisplayName, version, error, where);
         }
 
         internal void ShowError(String modName, String modVersion, Exception error, String where = "")
@@ -318,8 +329,9 @@ namespace StarshipTheory.ModLib
 
             if(ex is TypeLoadException)
                 str += indent + "<b>Type Name:</b> " + ((TypeLoadException)ex).TypeName + "\n";
-            else if (ex is System.Reflection.ReflectionTypeLoadException rex)
+            else if (ex is System.Reflection.ReflectionTypeLoadException)
             {
+                System.Reflection.ReflectionTypeLoadException rex = (System.Reflection.ReflectionTypeLoadException)ex;
                 if (rex == null)
                     str += indent + "<b><color=yellow>REFLECTION TYPE LOAD FAILED</color></b>";
                 else

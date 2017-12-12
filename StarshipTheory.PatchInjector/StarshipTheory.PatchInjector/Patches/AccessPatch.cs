@@ -16,9 +16,14 @@ namespace StarshipTheory.PatchInjector.Patches
 
         public override void Inject()
         {
+            InjectionHelper.Instance.SetupReferences(GameModule);
+
             GameModule.GetTypes().ToList().ForEach(t => {
                 if (!t.IsNested)
+                {
                     t.IsPublic = true;
+                    InjectionHelper.Instance.CreateModMethods(t);
+                }
                 else
                     t.IsNestedPublic = true;
             });
@@ -35,7 +40,7 @@ namespace StarshipTheory.PatchInjector.Patches
                     if (f.IsPrivate)
                     {
                         f.IsFamily = true;
-                        InjectionHelper.Instance.CreateSetterGetterFor(f, t, f.IsStatic);
+                        //InjectionHelper.Instance.CreateSetterGetterFor(f, t, f.IsStatic);
                     }
                 });
             });
