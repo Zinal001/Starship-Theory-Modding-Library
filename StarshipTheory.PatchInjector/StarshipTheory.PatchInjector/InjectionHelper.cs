@@ -9,33 +9,20 @@ namespace StarshipTheory.PatchInjector
 {
     class InjectionHelper
     {
+        internal static class HelperPlaceHolder
+        {
+
+        }
+
+        internal class HelperGenericClass
+        {
+
+        }
+
         public static InjectionHelper Instance { get; private set; }
         private static TypeReference NullType;
 
         private PatchInjector _Injector;
-        
-        private TypeReference TypeTypeRef = null;
-        private TypeReference ObjectTypeRef = null;
-        private TypeReference ObjectArrayTypeRef = null;
-        private TypeReference StringTypeRef = null;
-        private TypeReference MethodInfoRef = null;
-        private TypeReference MethodBaseRef = null;
-
-        private MethodReference TypeGetTypeFromHandle = null;
-        private MethodReference ObjectGetTypeRef = null;
-        private MethodReference TypeGetMethodRef = null;
-        private MethodReference MethodBaseInvokeRef = null;
-
-        private MethodReference ObjectGetFieldRef = null;
-        private MethodReference FieldInfoGetValueRef = null;
-        private MethodReference FieldInfoSetValueRef = null;
-
-        private MethodReference ObjectGetPropertyRef = null;
-        private MethodReference PropertyInfoGetValueRef = null;
-        private MethodReference PropertyInfoSetValueRef = null;
-
-        private MethodReference FieldInfoIsStaticRef = null;
-        private MethodReference ParamArrayAttributeRef = null;
 
         public InjectionHelper(PatchInjector Injector)
         {
@@ -44,502 +31,303 @@ namespace StarshipTheory.PatchInjector
 
             NullType = Patches.BasePatch.GameModule.Import(typeof(void));
         }
+        
+        public static T _Mod_GetGenericStaticFieldValue<T>(String name)
+        {
+            System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetType().GetField(name);
+            return (T)field.GetValue(null);
+        }
 
-        public Object GetValue(String name)
+        public T _Mod_GetGenericFieldValue<T>(String name)
         {
             System.Reflection.FieldInfo field = this.GetType().GetField(name);
-            return field.GetValue(field.IsStatic ? null : this);
+            return (T)field.GetValue(field.IsStatic ? null : this);
         }
 
-        internal void SetupReferences(ModuleDefinition module)
+        public static void _Mod_SetStaticFieldValue(String name, Object value)
         {
-
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("METHODS.txt", false, Encoding.UTF8))
-            {
-                MethodDefinition refTest = _Injector.GetModuleZ(System.Reflection.Assembly.GetEntryAssembly().Location).GetTypeByName("InjectionHelper").GetMethodByName("GetValue");
-
-                foreach (Instruction inst in refTest.Body.Instructions)
-                    sw.WriteLine(inst.ToString());
-
-            }
-            if (TypeTypeRef == null)
-                    TypeTypeRef = module.Import(typeof(Type));
-
-            if (ObjectTypeRef == null)
-                ObjectTypeRef = module.Import(typeof(System.Object));
-
-            if (ObjectArrayTypeRef == null)
-                ObjectArrayTypeRef = module.Import(typeof(System.Object[]));
-
-            if (StringTypeRef == null)
-                StringTypeRef = module.Import(typeof(String));
-
-            if (MethodInfoRef == null)
-                MethodInfoRef = module.Import(typeof(System.Reflection.MethodInfo));
-
-            if (MethodBaseRef == null)
-                MethodBaseRef = module.Import(typeof(System.Reflection.MethodBase));
-
-            if (TypeGetTypeFromHandle == null)
-                TypeGetTypeFromHandle = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("Type").GetMethodByName("GetTypeFromHandle"));
-
-            if (ObjectGetTypeRef == null)
-                ObjectGetTypeRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("Object").GetMethodByName("GetType"));
-
-            if (TypeGetMethodRef == null)
-                TypeGetMethodRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("Type").GetMethodByName("GetMethod", 1, StringTypeRef));
-
-            if (MethodBaseInvokeRef == null)
-                MethodBaseInvokeRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("MethodBase").GetMethodByName("Invoke", 2));
-
-            if (ObjectGetFieldRef == null)
-                ObjectGetFieldRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("Type").GetMethodByName("GetField", 1, StringTypeRef));
-
-            if (FieldInfoGetValueRef == null)
-                FieldInfoGetValueRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("FieldInfo").GetMethodByName("GetValue"));
-
-            if (FieldInfoSetValueRef == null)
-                FieldInfoSetValueRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("FieldInfo").GetMethodByName("SetValue", 2));
-
-            if (ObjectGetPropertyRef == null)
-                ObjectGetPropertyRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("Type").GetMethodByName("GetProperty", 1));
-
-            if (PropertyInfoGetValueRef == null)
-                PropertyInfoGetValueRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("PropertyInfo").GetMethodByName("GetValue", 2));
-
-            if (PropertyInfoSetValueRef == null)
-                PropertyInfoSetValueRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("PropertyInfo").GetMethodByName("SetValue", 3));
-
-            if(ParamArrayAttributeRef == null)
-                ParamArrayAttributeRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("ParamArrayAttribute").GetMethodByName(".ctor"));
-
-            if(FieldInfoIsStaticRef == null)
-                FieldInfoIsStaticRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("FieldInfo").GetMethodByName("get_IsStatic"));
+            System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetField(name);
+            field.SetValue(null, value);
         }
 
-        private void CreateStaticSetProperty(TypeDefinition ownerType, bool withParams = false)
+        public void _Mod_SetFieldValue(String name, Object value)
         {
-            //TODO: Make sure this one work (SST doesn't have any static properties right now)
-
-            MethodDefinition md = new MethodDefinition("_Mod_SetStaticProperty", MethodAttributes.Public | MethodAttributes.Static, NullType);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, ObjectTypeRef));
-
-            Instruction[] instructions = null;
-
-            if(withParams)
-            {
-                ParameterDefinition pd = new ParameterDefinition("index", ParameterAttributes.None, ObjectArrayTypeRef);
-                pd.CustomAttributes.Add(new CustomAttribute(ParamArrayAttributeRef));
-                md.Parameters.Add(pd);
-                instructions = new Instruction[] {
-                    Instruction.Create(OpCodes.Ldtoken, ownerType),
-                    Instruction.Create(OpCodes.Call, TypeGetTypeFromHandle),
-                    Instruction.Create(OpCodes.Ldarg_0),
-                    Instruction.Create(OpCodes.Callvirt, ObjectGetPropertyRef),
-                    Instruction.Create(OpCodes.Ldnull),
-                    Instruction.Create(OpCodes.Ldarg_1),
-                    Instruction.Create(OpCodes.Ldarg_2),
-                    Instruction.Create(OpCodes.Callvirt, PropertyInfoSetValueRef),
-                    Instruction.Create(OpCodes.Ret)
-                };
-            }
-            else
-            {
-                instructions = new Instruction[] {
-                    Instruction.Create(OpCodes.Ldtoken, ownerType),
-                    Instruction.Create(OpCodes.Call, TypeGetTypeFromHandle),
-                    Instruction.Create(OpCodes.Ldarg_0),
-                    Instruction.Create(OpCodes.Callvirt, ObjectGetPropertyRef),
-                    Instruction.Create(OpCodes.Ldnull),
-                    Instruction.Create(OpCodes.Ldarg_1),
-                    Instruction.Create(OpCodes.Ldnull),
-                    Instruction.Create(OpCodes.Callvirt, PropertyInfoSetValueRef),
-                    Instruction.Create(OpCodes.Ret)
-                };
-            }
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
+            System.Reflection.FieldInfo field = this.GetType().GetField(name);
+            field.SetValue(field.IsStatic ? null : this, value);
         }
 
-        private void CreateSetProperty(TypeDefinition ownerType, bool withParams = false)
+
+        public static T _Mod_GetGenericStaticPropertyValue<T>(String name)
         {
-            MethodDefinition md = new MethodDefinition("_Mod_SetProperty", MethodAttributes.Public, NullType);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, ObjectTypeRef));
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            return (T)prop.GetValue(null, null);
+        }
 
-            Instruction[] instructions = null;
+        public static T _Mod_GetGenericStaticPropertyValue<T>(String name, Object[] index)
+        {
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            return (T)prop.GetValue(null, index);
+        }
 
-            if (withParams)
+        public T _Mod_GetGenericPropertyValue<T>(string name)
+        {
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            return (T)prop.GetValue(prop.GetGetMethod().IsStatic ? null : this, null);
+        }
+
+        public T _Mod_GetGenericPropertyValue<T>(string name, Object[] index)
+        {
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            return (T)prop.GetValue(prop.GetGetMethod().IsStatic ? null : this, index);
+        }
+
+        public static void _Mod_SetStaticPropertyValue(String name, Object value)
+        {
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            prop.SetValue(null, value, null);
+        }
+
+        public static void _Mod_SetStaticPropertyValue(String name, Object value, Object[] index)
+        {
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            prop.SetValue(null, value, index);
+        }
+
+        public void _Mod_SetPropertyValue(String name, Object value)
+        {
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            prop.SetValue(prop.GetSetMethod().IsStatic ? null : this, value, null);
+        }
+
+        public void _Mod_SetPropertyValue(String name, Object value, Object[] index)
+        {
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            prop.SetValue(prop.GetSetMethod().IsStatic ? null : this, value, index);
+        }
+
+        public static T _Mod_GenericCallStaticMethod<T>(String name, params Object[] parameters)
+        {
+            System.Reflection.MethodInfo method = typeof(HelperPlaceHolder).GetMethod(name);
+            return (T)method.Invoke(null, parameters);
+        }
+
+        public static Object _Mod_CallStaticMethod(String name, params Object[] parameters)
+        {
+            System.Reflection.MethodInfo method = typeof(HelperPlaceHolder).GetMethod(name);
+            return method.Invoke(null, parameters);
+        }
+
+        public Object _Mod_CallMethod(String name, params Object[] parameters)
+        {
+            System.Reflection.MethodInfo method = this.GetType().GetMethod(name);
+            return method.Invoke(method.IsStatic ? null : this, parameters);
+        }
+
+        public T _Mod_GenericCallMethod<T>(String name, params Object[] parameters)
+        {
+            System.Reflection.MethodInfo method = this.GetType().GetMethod(name);
+            return (T)method.Invoke(method.IsStatic ? null : this, parameters);
+        }
+
+        private void CopyMethodTo(MethodDefinition method, TypeDefinition ownerType, String methodName = null, Type genericType = null)
+        {
+            if (String.IsNullOrEmpty(methodName))
+                methodName = method.Name;
+
+            MethodDefinition newMethod = null;
+
+            if (method.HasGenericParameters)
             {
-                ParameterDefinition pd = new ParameterDefinition("index", ParameterAttributes.None, ObjectArrayTypeRef);
-                pd.CustomAttributes.Add(new CustomAttribute(ParamArrayAttributeRef));
-                md.Parameters.Add(pd);
-                instructions = new Instruction[] {
-                    Instruction.Create(OpCodes.Ldarg_0),
-                    Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                    Instruction.Create(OpCodes.Ldarg_1),
-                    Instruction.Create(OpCodes.Call, ObjectGetPropertyRef),
-                    Instruction.Create(OpCodes.Ldarg_0),
-                    Instruction.Create(OpCodes.Ldarg_2),
-                    Instruction.Create(OpCodes.Ldarg_3),
-                    Instruction.Create(OpCodes.Callvirt, PropertyInfoSetValueRef),
-                    Instruction.Create(OpCodes.Ret)
-                };
+                newMethod = new MethodDefinition(methodName, method.Attributes, ownerType.Module.Import(typeof(Object)));
+
+                foreach (GenericParameter gp in method.GenericParameters)
+                    newMethod.GenericParameters.Add(new GenericParameter(gp.Name, newMethod));
+
+                newMethod.ReturnType = newMethod.GenericParameters.Where(gp => gp.Name == method.ReturnType.Name).FirstOrDefault();
             }
             else
+                newMethod = new MethodDefinition(methodName, method.Attributes, ownerType.Module.Import(method.ReturnType));
+
+            newMethod.CallingConvention = method.CallingConvention;
+            newMethod.ExplicitThis = method.ExplicitThis;
+
+            foreach(ParameterDefinition pd in method.Parameters)
             {
-                instructions = new Instruction[] {
-                    Instruction.Create(OpCodes.Ldarg_0),
-                    Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                    Instruction.Create(OpCodes.Ldarg_1),
-                    Instruction.Create(OpCodes.Call, ObjectGetPropertyRef),
-                    Instruction.Create(OpCodes.Ldarg_0),
-                    Instruction.Create(OpCodes.Ldarg_2),
-                    Instruction.Create(OpCodes.Ldnull),
-                    Instruction.Create(OpCodes.Callvirt, PropertyInfoSetValueRef),
-                    Instruction.Create(OpCodes.Ret)
-                };
-            }
+                ParameterDefinition newPd = new ParameterDefinition(pd.Name, pd.Attributes, ownerType.Module.Import(pd.ParameterType));
 
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateStaticGetProperty(TypeDefinition ownerType)
-        {
-            //TODO: Make sure this one work (SST doesn't have any static properties right now)
-
-            MethodDefinition md = new MethodDefinition("_Mod_GetStaticProperty", MethodAttributes.Public | MethodAttributes.Static, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldtoken, ownerType),
-                Instruction.Create(OpCodes.Call, TypeGetTypeFromHandle),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Callvirt, ObjectGetPropertyRef),
-                Instruction.Create(OpCodes.Ldnull),
-                Instruction.Create(OpCodes.Callvirt, PropertyInfoGetValueRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateGetProperty(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_GetProperty", MethodAttributes.Public, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("index", ParameterAttributes.HasDefault | ParameterAttributes.Optional, ObjectArrayTypeRef) { Constant = null });
-
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, ObjectGetPropertyRef),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Ldarg_2),
-                Instruction.Create(OpCodes.Callvirt, PropertyInfoGetValueRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-
-        }
-
-        private void CreateStaticSetField(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_SetStaticField", MethodAttributes.Public | MethodAttributes.Static, NullType);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, ObjectTypeRef));
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldtoken, ownerType),
-                Instruction.Create(OpCodes.Call, TypeGetTypeFromHandle),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Callvirt, ObjectGetFieldRef),
-                Instruction.Create(OpCodes.Ldnull),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, FieldInfoSetValueRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateSetField(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_SetField", MethodAttributes.Public, NullType);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, ObjectTypeRef));
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Call, ObjectGetFieldRef),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Ldarg_2),
-                Instruction.Create(OpCodes.Callvirt, FieldInfoSetValueRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateStaticGetField(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_GetStaticField", MethodAttributes.Public | MethodAttributes.Static, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldtoken, ownerType),
-                Instruction.Create(OpCodes.Call, TypeGetTypeFromHandle),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Callvirt, ObjectGetFieldRef),
-                Instruction.Create(OpCodes.Ldnull),
-                Instruction.Create(OpCodes.Callvirt, FieldInfoGetValueRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateGetField2(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_GetField", MethodAttributes.Public, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-
-            Instruction emptyInstruction = Instruction.Create(OpCodes.Ldnull);
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Nop),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, ObjectGetFieldRef),
-                Instruction.Create(OpCodes.Stloc_0),
-                Instruction.Create(OpCodes.Ldloc_0),
-                Instruction.Create(OpCodes.Ldloc_0),
-                Instruction.Create(OpCodes.Callvirt, FieldInfoIsStaticRef),
-                Instruction.Create(OpCodes.Brtrue_S, emptyInstruction),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Br_S, emptyInstruction),
-                Instruction.Create(OpCodes.Ldnull),
-                Instruction.Create(OpCodes.Callvirt, FieldInfoGetValueRef),
-                Instruction.Create(OpCodes.Stloc_1),
-                Instruction.Create(OpCodes.Br_S, emptyInstruction),
-                Instruction.Create(OpCodes.Ldloc_1),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            instructions[9].Operand = instructions[12];
-            instructions[11].Operand = instructions[13];
-            instructions[15].Operand = instructions[16];
-
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("Methods2.txt", false))
-            {
-                foreach (Instruction inst in instructions)
+                foreach (CustomAttribute attr in pd.CustomAttributes)
                 {
-                    md.Body.Instructions.Add(inst);
-                    sw.WriteLine(inst);
+                    CustomAttribute nAttr = new CustomAttribute(ownerType.Module.Import(attr.Constructor.Resolve()), attr.GetBlob());
+                    if(attr.HasConstructorArguments)
+                    {
+                        foreach(CustomAttributeArgument arg in attr.ConstructorArguments)
+                        {
+                            if (arg.Type == null)
+                                nAttr.ConstructorArguments.Add(new CustomAttributeArgument());
+                            else
+                                nAttr.ConstructorArguments.Add(new CustomAttributeArgument(ownerType.Module.Import(arg.Type.Resolve()), arg.Value));
+                        }
+                    }
+
+                    if(attr.HasFields)
+                    {
+                        foreach(CustomAttributeNamedArgument arg in attr.Fields)
+                        {
+                            if (String.IsNullOrEmpty(arg.Name))
+                                nAttr.Fields.Add(new CustomAttributeNamedArgument());
+                            else
+                                nAttr.Fields.Add(new CustomAttributeNamedArgument(arg.Name, arg.Argument));
+                        }
+                    }
+
+                    if(attr.HasProperties)
+                    {
+                        foreach (CustomAttributeNamedArgument arg in attr.Properties)
+                        {
+                            if (String.IsNullOrEmpty(arg.Name))
+                                nAttr.Properties.Add(new CustomAttributeNamedArgument());
+                            else
+                                nAttr.Properties.Add(new CustomAttributeNamedArgument(arg.Name, arg.Argument));
+                        }
+                    }
+
+                    newPd.CustomAttributes.Add(nAttr);
+                }
+
+                if(pd.HasConstant)
+                    newPd.Constant = pd.Constant;
+
+                newMethod.Parameters.Add(newPd);
+            }
+
+            foreach(CustomAttribute attr in method.CustomAttributes)
+            {
+                newMethod.CustomAttributes.Add(new CustomAttribute(ownerType.Module.Import(attr.Constructor.Resolve()), attr.GetBlob()));
+            }
+
+            Instruction[] instructions = method.Body.Instructions.ToArray();
+            ILProcessor processor = newMethod.Body.GetILProcessor();
+
+            foreach(Instruction inst in instructions)
+            {
+                if(inst.OpCode == OpCodes.Ldtoken && ((TypeReference)inst.Operand).Name == "HelperPlaceHolder")
+                    processor.Append(Instruction.Create(inst.OpCode, ownerType));
+                else if (inst.Operand is MethodReference)
+                    processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((MethodReference)inst.Operand).Resolve())));
+                else if (inst.Operand is FieldReference)
+                    processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((FieldReference)inst.Operand).Resolve())));
+                else if (inst.Operand is TypeReference)
+                {
+                    if(((TypeReference)inst.Operand).Name == "HelperGenericClass")
+                        processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((TypeReference)inst.Operand).Resolve())));
+                    else if(((TypeReference)inst.Operand).IsGenericParameter)
+                        processor.Append(Instruction.Create(inst.OpCode, newMethod.GenericParameters.Where(gp => gp.Name == ((TypeReference)inst.Operand).Name).FirstOrDefault()));
+                    else
+                        processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((TypeReference)inst.Operand).Resolve())));
+                }
+                else if(inst.Operand is Instruction)
+                    processor.Append(Instruction.Create(inst.OpCode, inst.Operand as Instruction));
+                else
+                    processor.Append(inst);
+            }
+
+            //COPY BODY
+            newMethod.Body.MaxStackSize = method.Body.MaxStackSize;
+            if (method.Body.HasExceptionHandlers)
+            {
+                foreach(ExceptionHandler eh in method.Body.ExceptionHandlers)
+                {
+                    ExceptionHandler nEh = new ExceptionHandler(eh.HandlerType);
+
+                    nEh.CatchType = eh.CatchType == null ? null :  ownerType.Module.Import(eh.CatchType);
+                    nEh.FilterStart = eh.FilterStart == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.FilterStart.Offset).FirstOrDefault();
+                    nEh.HandlerStart = eh.HandlerStart == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.HandlerStart.Offset).FirstOrDefault();
+                    nEh.HandlerEnd = eh.HandlerEnd == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.HandlerEnd.Offset).FirstOrDefault();
+                    nEh.TryStart = eh.TryStart == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.TryStart.Offset).FirstOrDefault();
+                    nEh.TryEnd = eh.TryEnd == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.TryEnd.Offset).FirstOrDefault();
+
+                    newMethod.Body.ExceptionHandlers.Add(nEh);
                 }
             }
 
-            ownerType.Methods.Add(md);
-        }
+            if(method.Body.HasVariables)
+            {
+                foreach (VariableDefinition vd in method.Body.Variables)
+                {
+                    if(vd.VariableType.IsGenericParameter)
+                        newMethod.Body.Variables.Add(new VariableDefinition(vd.Name, newMethod.GenericParameters.Where(gp => gp.Name == vd.VariableType.Name).FirstOrDefault()));
+                    else
+                        newMethod.Body.Variables.Add(new VariableDefinition(vd.Name, ownerType.Module.Import(vd.VariableType.Resolve())));
+                }
+            }
 
-        private void CreateGetField(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_GetField", MethodAttributes.Public, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Call, ObjectGetFieldRef),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Callvirt, FieldInfoGetValueRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateStaticCallMethod(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_CallStaticMethod", MethodAttributes.Public | MethodAttributes.Static, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("parameters", ParameterAttributes.HasDefault | ParameterAttributes.Optional, ObjectArrayTypeRef) { Constant = null });
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldtoken, ownerType),
-                Instruction.Create(OpCodes.Call, TypeGetTypeFromHandle),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Callvirt, TypeGetMethodRef),
-                Instruction.Create(OpCodes.Ldnull),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, MethodBaseInvokeRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
-        }
-
-        private void CreateCallMethod(TypeDefinition ownerType)
-        {
-            MethodDefinition md = new MethodDefinition("_Mod_CallMethod", MethodAttributes.Public, ObjectTypeRef);
-            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
-            md.Parameters.Add(new ParameterDefinition("parameters", ParameterAttributes.None, ObjectArrayTypeRef));
-            md.Parameters.Last().CustomAttributes.Add(new CustomAttribute(ParamArrayAttributeRef));
-
-            Instruction[] instructions = new Instruction[] {
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
-                Instruction.Create(OpCodes.Ldarg_1),
-                Instruction.Create(OpCodes.Callvirt, TypeGetMethodRef),
-                Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Ldarg_2),
-                Instruction.Create(OpCodes.Callvirt, MethodBaseInvokeRef),
-                Instruction.Create(OpCodes.Ret)
-            };
-
-            foreach (Instruction inst in instructions)
-                md.Body.Instructions.Add(inst);
-
-            ownerType.Methods.Add(md);
+            ownerType.Methods.Add(newMethod);
         }
 
         public void CreateModMethods(TypeDefinition ownerType)
         {
+            TypeDefinition helperType = AssemblyDefinition.ReadAssembly(System.Reflection.Assembly.GetEntryAssembly().Location).MainModule.GetTypeByName("InjectionHelper");
+
             if (ownerType.IsPublic && ownerType.IsAbstract && ownerType.IsSealed) //Static class
             {
                 if (ownerType.HasFields)
                 {
-                    CreateStaticGetField(ownerType);
-                    CreateStaticSetField(ownerType);
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticFieldValue"), "_Mod_GetFieldValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticFieldValue"), "_Mod_SetFieldValue");
+
+                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticFieldValue"), ownerType, "_Mod_GetFieldValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticFieldValue"), ownerType, "_Mod_SetFieldValue");*/
                 }
 
                 if(ownerType.HasProperties)
                 {
-                    CreateStaticGetProperty(ownerType);
-                    CreateStaticSetProperty(ownerType);
-                    CreateStaticSetProperty(ownerType, true);
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 1), "_Mod_GetPropertyValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 2), "_Mod_GetPropertyValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 2), "_Mod_SetPropertyValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 3), "_Mod_SetPropertyValue");
+
+                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 1), ownerType, "_Mod_GetPropertyValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 2), ownerType, "_Mod_GetPropertyValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 2), ownerType, "_Mod_SetPropertyValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 3), ownerType, "_Mod_SetPropertyValue");*/
                 }
 
                 if (ownerType.HasMethods)
-                    CreateStaticCallMethod(ownerType);
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallStaticMethod"), "_Mod_CallMethod");
+
+                    //CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallStaticMethod"), ownerType, "_Mod_CallMethod");
             }
             else if (ownerType.IsPublic && !ownerType.IsAbstract && !ownerType.IsInterface) //Instance class
             {
                 if (ownerType.HasFields)
                 {
-                    CreateGetField2(ownerType);
-                    //CreateGetField(ownerType);
-                    CreateSetField(ownerType);
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericFieldValue"), "_Mod_GetFieldValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetFieldValue"));
 
-                    foreach(FieldDefinition field in ownerType.Fields)
-                    {
-                        if(field.IsStatic)
-                        {
-                            CreateStaticGetField(ownerType);
-                            CreateStaticSetField(ownerType);
-                            break;
-                        }
-                    }
+                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericFieldValue"), ownerType, "_Mod_GetFieldValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetFieldValue"), ownerType);*/
                 }
 
                 if(ownerType.HasProperties)
                 {
-                    CreateGetProperty(ownerType);
-                    CreateSetProperty(ownerType);
-                    CreateSetProperty(ownerType, true);
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 1), "_Mod_GetPropertyValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 2), "_Mod_GetPropertyValue");
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 2));
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 3));
 
-                    foreach(PropertyDefinition property in ownerType.Properties)
-                    {
-                        if((property.GetMethod != null && property.GetMethod.IsStatic) || (property.SetMethod != null && property.SetMethod.IsStatic))
-                        {
-                            CreateStaticGetProperty(ownerType);
-                            CreateStaticSetProperty(ownerType);
-                            CreateStaticSetProperty(ownerType, true);
-                            break;
-                        }
-                    }
+                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 1), ownerType, "_Mod_GetPropertyValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 2), ownerType, "_Mod_GetPropertyValue");
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 2), ownerType);
+                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 3), ownerType);*/
 
                 }
 
                 if (ownerType.HasMethods)
                 {
-                    CreateCallMethod(ownerType);
-
-                    foreach(MethodDefinition method in ownerType.Methods)
-                    {
-                        if(method.IsStatic)
-                        {
-                            CreateStaticCallMethod(ownerType);
-                            break;
-                        }
-                    }
+                    ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallMethod"), "_Mod_CallMethod");
+                    //CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallMethod"), ownerType, "_Mod_CallMethod");
                 }
             }
         }
-
-        public void CreateSetterGetterFor(FieldDefinition field, TypeDefinition ownerType, bool isStaticField = false)
-        {
-            MethodDefinition set_method = new MethodDefinition("_ModSet_" + field.Name, MethodAttributes.Public, NullType);
-            set_method.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, field.FieldType));
-
-            set_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-            set_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-            if(isStaticField)
-                set_method.Body.Instructions.Add(Instruction.Create(OpCodes.Stsfld, Patches.BasePatch.GameModule.Import(field)));
-            else
-                set_method.Body.Instructions.Add(Instruction.Create(OpCodes.Stfld, Patches.BasePatch.GameModule.Import(field)));
-            set_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-
-            ownerType.Methods.Add(set_method);
-
-            MethodDefinition get_method = new MethodDefinition("_ModGet_" + field.Name, MethodAttributes.Public, field.FieldType);
-
-            get_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-            if(isStaticField)
-                get_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldsfld, Patches.BasePatch.GameModule.Import(field)));
-            else
-                get_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldfld, Patches.BasePatch.GameModule.Import(field)));
-
-            get_method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-
-            ownerType.Methods.Add(get_method);
-        }
-
-
     }
 }
