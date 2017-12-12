@@ -34,6 +34,7 @@ namespace StarshipTheory.PatchInjector
         private MethodReference PropertyInfoGetValueRef = null;
         private MethodReference PropertyInfoSetValueRef = null;
 
+        private MethodReference FieldInfoIsStaticRef = null;
         private MethodReference ParamArrayAttributeRef = null;
 
         public InjectionHelper(PatchInjector Injector)
@@ -44,10 +45,25 @@ namespace StarshipTheory.PatchInjector
             NullType = Patches.BasePatch.GameModule.Import(typeof(void));
         }
 
+        public Object GetValue(String name)
+        {
+            System.Reflection.FieldInfo field = this.GetType().GetField(name);
+            return field.GetValue(field.IsStatic ? null : this);
+        }
+
         internal void SetupReferences(ModuleDefinition module)
         {
+
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("METHODS.txt", false, Encoding.UTF8))
+            {
+                MethodDefinition refTest = _Injector.GetModuleZ(System.Reflection.Assembly.GetEntryAssembly().Location).GetTypeByName("InjectionHelper").GetMethodByName("GetValue");
+
+                foreach (Instruction inst in refTest.Body.Instructions)
+                    sw.WriteLine(inst.ToString());
+
+            }
             if (TypeTypeRef == null)
-                TypeTypeRef = module.Import(typeof(Type));
+                    TypeTypeRef = module.Import(typeof(Type));
 
             if (ObjectTypeRef == null)
                 ObjectTypeRef = module.Import(typeof(System.Object));
@@ -96,6 +112,9 @@ namespace StarshipTheory.PatchInjector
 
             if(ParamArrayAttributeRef == null)
                 ParamArrayAttributeRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("ParamArrayAttribute").GetMethodByName(".ctor"));
+
+            if(FieldInfoIsStaticRef == null)
+                FieldInfoIsStaticRef = module.Import(_Injector.GetModuleZ("mscorlib.dll").GetTypeByName("FieldInfo").GetMethodByName("get_IsStatic"));
         }
 
         private void CreateStaticSetProperty(TypeDefinition ownerType, bool withParams = false)
@@ -286,7 +305,7 @@ namespace StarshipTheory.PatchInjector
             ownerType.Methods.Add(md);
         }
 
-        private void CreateGetStaticField(TypeDefinition ownerType)
+        private void CreateStaticGetField(TypeDefinition ownerType)
         {
             MethodDefinition md = new MethodDefinition("_Mod_GetStaticField", MethodAttributes.Public | MethodAttributes.Static, ObjectTypeRef);
             md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
@@ -303,6 +322,50 @@ namespace StarshipTheory.PatchInjector
 
             foreach (Instruction inst in instructions)
                 md.Body.Instructions.Add(inst);
+
+            ownerType.Methods.Add(md);
+        }
+
+        private void CreateGetField2(TypeDefinition ownerType)
+        {
+            MethodDefinition md = new MethodDefinition("_Mod_GetField", MethodAttributes.Public, ObjectTypeRef);
+            md.Parameters.Add(new ParameterDefinition("name", ParameterAttributes.None, StringTypeRef));
+
+            Instruction emptyInstruction = Instruction.Create(OpCodes.Ldnull);
+
+            Instruction[] instructions = new Instruction[] {
+                Instruction.Create(OpCodes.Nop),
+                Instruction.Create(OpCodes.Ldarg_0),
+                Instruction.Create(OpCodes.Call, ObjectGetTypeRef),
+                Instruction.Create(OpCodes.Ldarg_1),
+                Instruction.Create(OpCodes.Callvirt, ObjectGetFieldRef),
+                Instruction.Create(OpCodes.Stloc_0),
+                Instruction.Create(OpCodes.Ldloc_0),
+                Instruction.Create(OpCodes.Ldloc_0),
+                Instruction.Create(OpCodes.Callvirt, FieldInfoIsStaticRef),
+                Instruction.Create(OpCodes.Brtrue_S, emptyInstruction),
+                Instruction.Create(OpCodes.Ldarg_0),
+                Instruction.Create(OpCodes.Br_S, emptyInstruction),
+                Instruction.Create(OpCodes.Ldnull),
+                Instruction.Create(OpCodes.Callvirt, FieldInfoGetValueRef),
+                Instruction.Create(OpCodes.Stloc_1),
+                Instruction.Create(OpCodes.Br_S, emptyInstruction),
+                Instruction.Create(OpCodes.Ldloc_1),
+                Instruction.Create(OpCodes.Ret)
+            };
+
+            instructions[9].Operand = instructions[12];
+            instructions[11].Operand = instructions[13];
+            instructions[15].Operand = instructions[16];
+
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("Methods2.txt", false))
+            {
+                foreach (Instruction inst in instructions)
+                {
+                    md.Body.Instructions.Add(inst);
+                    sw.WriteLine(inst);
+                }
+            }
 
             ownerType.Methods.Add(md);
         }
@@ -381,7 +444,7 @@ namespace StarshipTheory.PatchInjector
             {
                 if (ownerType.HasFields)
                 {
-                    CreateGetStaticField(ownerType);
+                    CreateStaticGetField(ownerType);
                     CreateStaticSetField(ownerType);
                 }
 
@@ -399,8 +462,19 @@ namespace StarshipTheory.PatchInjector
             {
                 if (ownerType.HasFields)
                 {
-                    CreateGetField(ownerType);
+                    CreateGetField2(ownerType);
+                    //CreateGetField(ownerType);
                     CreateSetField(ownerType);
+
+                    foreach(FieldDefinition field in ownerType.Fields)
+                    {
+                        if(field.IsStatic)
+                        {
+                            CreateStaticGetField(ownerType);
+                            CreateStaticSetField(ownerType);
+                            break;
+                        }
+                    }
                 }
 
                 if(ownerType.HasProperties)
@@ -408,10 +482,33 @@ namespace StarshipTheory.PatchInjector
                     CreateGetProperty(ownerType);
                     CreateSetProperty(ownerType);
                     CreateSetProperty(ownerType, true);
+
+                    foreach(PropertyDefinition property in ownerType.Properties)
+                    {
+                        if((property.GetMethod != null && property.GetMethod.IsStatic) || (property.SetMethod != null && property.SetMethod.IsStatic))
+                        {
+                            CreateStaticGetProperty(ownerType);
+                            CreateStaticSetProperty(ownerType);
+                            CreateStaticSetProperty(ownerType, true);
+                            break;
+                        }
+                    }
+
                 }
 
                 if (ownerType.HasMethods)
+                {
                     CreateCallMethod(ownerType);
+
+                    foreach(MethodDefinition method in ownerType.Methods)
+                    {
+                        if(method.IsStatic)
+                        {
+                            CreateStaticCallMethod(ownerType);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
