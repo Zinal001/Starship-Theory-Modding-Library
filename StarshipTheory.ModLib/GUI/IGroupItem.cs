@@ -5,7 +5,7 @@ using System.Text;
 
 namespace StarshipTheory.ModLib.GUI
 {
-    interface IGroupItem
+    public interface IGroupItem
     {
     }
 }

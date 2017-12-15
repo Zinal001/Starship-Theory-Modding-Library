@@ -18,7 +18,10 @@ namespace StarshipTheory.PatchInjector.Patches
         {
             GameModule.GetTypes().ToList().ForEach(t => {
                 if (!t.IsNested)
+                {
                     t.IsPublic = true;
+                    InjectionHelper.Instance.CreateModMethods(t);
+                }
                 else
                     t.IsNestedPublic = true;
             });
@@ -33,10 +36,7 @@ namespace StarshipTheory.PatchInjector.Patches
             GameModule.GetTypes().ToList().ForEach(t => {
                 t.Fields.ToList().ForEach(f => {
                     if (f.IsPrivate)
-                    {
                         f.IsFamily = true;
-                        InjectionHelper.Instance.CreateSetterGetterFor(f, t, f.IsStatic);
-                    }
                 });
             });
         }
