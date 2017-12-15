@@ -103,6 +103,7 @@
     <Compile Include="Resources\EntityCost.cs" />
     <Compile Include="Util\TilesUtil.cs" />
     <Compile Include="Util\WaitForRealSeconds.cs" />
+    <Compile Include="__BugFixes.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
