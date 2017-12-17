@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\TileEvents.cs" />
     <Compile Include="GUI\IResizeable.cs" />
     <Compile Include="GUI\ResizeHandle.cs" />
     <Compile Include="GUI\WindowButton.cs" />

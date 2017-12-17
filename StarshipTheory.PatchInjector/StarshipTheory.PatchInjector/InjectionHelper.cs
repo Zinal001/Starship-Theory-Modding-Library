@@ -31,7 +31,7 @@ namespace StarshipTheory.PatchInjector
 
             NullType = Patches.BasePatch.GameModule.Import(typeof(void));
         }
-        
+
         public static T _Mod_GetGenericStaticFieldValue<T>(String name)
         {
             System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetType().GetField(name);
@@ -151,16 +151,16 @@ namespace StarshipTheory.PatchInjector
             newMethod.CallingConvention = method.CallingConvention;
             newMethod.ExplicitThis = method.ExplicitThis;
 
-            foreach(ParameterDefinition pd in method.Parameters)
+            foreach (ParameterDefinition pd in method.Parameters)
             {
                 ParameterDefinition newPd = new ParameterDefinition(pd.Name, pd.Attributes, ownerType.Module.Import(pd.ParameterType));
 
                 foreach (CustomAttribute attr in pd.CustomAttributes)
                 {
                     CustomAttribute nAttr = new CustomAttribute(ownerType.Module.Import(attr.Constructor.Resolve()), attr.GetBlob());
-                    if(attr.HasConstructorArguments)
+                    if (attr.HasConstructorArguments)
                     {
-                        foreach(CustomAttributeArgument arg in attr.ConstructorArguments)
+                        foreach (CustomAttributeArgument arg in attr.ConstructorArguments)
                         {
                             if (arg.Type == null)
                                 nAttr.ConstructorArguments.Add(new CustomAttributeArgument());
@@ -169,9 +169,9 @@ namespace StarshipTheory.PatchInjector
                         }
                     }
 
-                    if(attr.HasFields)
+                    if (attr.HasFields)
                     {
-                        foreach(CustomAttributeNamedArgument arg in attr.Fields)
+                        foreach (CustomAttributeNamedArgument arg in attr.Fields)
                         {
                             if (String.IsNullOrEmpty(arg.Name))
                                 nAttr.Fields.Add(new CustomAttributeNamedArgument());
@@ -180,7 +180,7 @@ namespace StarshipTheory.PatchInjector
                         }
                     }
 
-                    if(attr.HasProperties)
+                    if (attr.HasProperties)
                     {
                         foreach (CustomAttributeNamedArgument arg in attr.Properties)
                         {
@@ -194,13 +194,13 @@ namespace StarshipTheory.PatchInjector
                     newPd.CustomAttributes.Add(nAttr);
                 }
 
-                if(pd.HasConstant)
+                if (pd.HasConstant)
                     newPd.Constant = pd.Constant;
 
                 newMethod.Parameters.Add(newPd);
             }
 
-            foreach(CustomAttribute attr in method.CustomAttributes)
+            foreach (CustomAttribute attr in method.CustomAttributes)
             {
                 newMethod.CustomAttributes.Add(new CustomAttribute(ownerType.Module.Import(attr.Constructor.Resolve()), attr.GetBlob()));
             }
@@ -208,9 +208,9 @@ namespace StarshipTheory.PatchInjector
             Instruction[] instructions = method.Body.Instructions.ToArray();
             ILProcessor processor = newMethod.Body.GetILProcessor();
 
-            foreach(Instruction inst in instructions)
+            foreach (Instruction inst in instructions)
             {
-                if(inst.OpCode == OpCodes.Ldtoken && ((TypeReference)inst.Operand).Name == "HelperPlaceHolder")
+                if (inst.OpCode == OpCodes.Ldtoken && ((TypeReference)inst.Operand).Name == "HelperPlaceHolder")
                     processor.Append(Instruction.Create(inst.OpCode, ownerType));
                 else if (inst.Operand is MethodReference)
                     processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((MethodReference)inst.Operand).Resolve())));
@@ -218,14 +218,14 @@ namespace StarshipTheory.PatchInjector
                     processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((FieldReference)inst.Operand).Resolve())));
                 else if (inst.Operand is TypeReference)
                 {
-                    if(((TypeReference)inst.Operand).Name == "HelperGenericClass")
+                    if (((TypeReference)inst.Operand).Name == "HelperGenericClass")
                         processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((TypeReference)inst.Operand).Resolve())));
-                    else if(((TypeReference)inst.Operand).IsGenericParameter)
+                    else if (((TypeReference)inst.Operand).IsGenericParameter)
                         processor.Append(Instruction.Create(inst.OpCode, newMethod.GenericParameters.Where(gp => gp.Name == ((TypeReference)inst.Operand).Name).FirstOrDefault()));
                     else
                         processor.Append(Instruction.Create(inst.OpCode, ownerType.Module.Import(((TypeReference)inst.Operand).Resolve())));
                 }
-                else if(inst.Operand is Instruction)
+                else if (inst.Operand is Instruction)
                     processor.Append(Instruction.Create(inst.OpCode, inst.Operand as Instruction));
                 else
                     processor.Append(inst);
@@ -235,11 +235,11 @@ namespace StarshipTheory.PatchInjector
             newMethod.Body.MaxStackSize = method.Body.MaxStackSize;
             if (method.Body.HasExceptionHandlers)
             {
-                foreach(ExceptionHandler eh in method.Body.ExceptionHandlers)
+                foreach (ExceptionHandler eh in method.Body.ExceptionHandlers)
                 {
                     ExceptionHandler nEh = new ExceptionHandler(eh.HandlerType);
 
-                    nEh.CatchType = eh.CatchType == null ? null :  ownerType.Module.Import(eh.CatchType);
+                    nEh.CatchType = eh.CatchType == null ? null : ownerType.Module.Import(eh.CatchType);
                     nEh.FilterStart = eh.FilterStart == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.FilterStart.Offset).FirstOrDefault();
                     nEh.HandlerStart = eh.HandlerStart == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.HandlerStart.Offset).FirstOrDefault();
                     nEh.HandlerEnd = eh.HandlerEnd == null ? null : newMethod.Body.Instructions.Where(i => i.Offset == eh.HandlerEnd.Offset).FirstOrDefault();
@@ -250,11 +250,11 @@ namespace StarshipTheory.PatchInjector
                 }
             }
 
-            if(method.Body.HasVariables)
+            if (method.Body.HasVariables)
             {
                 foreach (VariableDefinition vd in method.Body.Variables)
                 {
-                    if(vd.VariableType.IsGenericParameter)
+                    if (vd.VariableType.IsGenericParameter)
                         newMethod.Body.Variables.Add(new VariableDefinition(vd.Name, newMethod.GenericParameters.Where(gp => gp.Name == vd.VariableType.Name).FirstOrDefault()));
                     else
                         newMethod.Body.Variables.Add(new VariableDefinition(vd.Name, ownerType.Module.Import(vd.VariableType.Resolve())));
@@ -274,28 +274,18 @@ namespace StarshipTheory.PatchInjector
                 {
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticFieldValue"), "_Mod_GetFieldValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticFieldValue"), "_Mod_SetFieldValue");
-
-                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticFieldValue"), ownerType, "_Mod_GetFieldValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticFieldValue"), ownerType, "_Mod_SetFieldValue");*/
                 }
 
-                if(ownerType.HasProperties)
+                if (ownerType.HasProperties)
                 {
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 1), "_Mod_GetPropertyValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 2), "_Mod_GetPropertyValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 2), "_Mod_SetPropertyValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 3), "_Mod_SetPropertyValue");
-
-                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 1), ownerType, "_Mod_GetPropertyValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericStaticPropertyValue", 2), ownerType, "_Mod_GetPropertyValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 2), ownerType, "_Mod_SetPropertyValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetStaticPropertyValue", 3), ownerType, "_Mod_SetPropertyValue");*/
                 }
 
                 if (ownerType.HasMethods)
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallStaticMethod"), "_Mod_CallMethod");
-
-                    //CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallStaticMethod"), ownerType, "_Mod_CallMethod");
             }
             else if (ownerType.IsPublic && !ownerType.IsAbstract && !ownerType.IsInterface) //Instance class
             {
@@ -303,31 +293,82 @@ namespace StarshipTheory.PatchInjector
                 {
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericFieldValue"), "_Mod_GetFieldValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetFieldValue"));
-
-                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericFieldValue"), ownerType, "_Mod_GetFieldValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetFieldValue"), ownerType);*/
                 }
 
-                if(ownerType.HasProperties)
+                if (ownerType.HasProperties)
                 {
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 1), "_Mod_GetPropertyValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 2), "_Mod_GetPropertyValue");
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 2));
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 3));
 
-                    /*CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 1), ownerType, "_Mod_GetPropertyValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_GetGenericPropertyValue", 2), ownerType, "_Mod_GetPropertyValue");
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 2), ownerType);
-                    CopyMethodTo(helperType.GetMethodByName("_Mod_SetPropertyValue", 3), ownerType);*/
-
                 }
 
                 if (ownerType.HasMethods)
                 {
                     ownerType.CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallMethod"), "_Mod_CallMethod");
-                    //CopyMethodTo(helperType.GetMethodByName("_Mod_GenericCallMethod"), ownerType, "_Mod_CallMethod");
                 }
             }
+        }
+
+        public void OverrideFieldWithProperty(FieldDefinition field, MethodDefinition onFieldChangedEvent = null)
+        {
+            PropertyDefinition propDef = new PropertyDefinition(field.Name, PropertyAttributes.None, field.FieldType);
+            field.Name = "__" + field.Name;
+
+            MethodAttributes attributes = MethodAttributes.Public | MethodAttributes.HideBySig;
+
+            if (field.IsStatic)
+                attributes = attributes | MethodAttributes.Static;
+
+            MethodDefinition getMethod = new MethodDefinition("get_" + propDef.Name, attributes, propDef.PropertyType);
+
+            ILProcessor processor = getMethod.Body.GetILProcessor();
+
+            List<Instruction> instructions = new List<Instruction> {
+                Instruction.Create(OpCodes.Ldarg_0),
+                Instruction.Create(OpCodes.Ldfld, Patches.BasePatch.GameModule.Import(field)),
+                Instruction.Create(OpCodes.Ret)
+            };
+
+            if (field.IsStatic)
+                instructions[1].OpCode = OpCodes.Ldsflda;
+
+            processor.InjectInstructionsToEnd(instructions);
+            propDef.GetMethod = getMethod;
+
+            MethodDefinition setMethod = new MethodDefinition("set_" + propDef.Name, attributes, NullType);
+            setMethod.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, Patches.BasePatch.GameModule.Import(propDef.PropertyType)));
+
+            instructions.Clear();
+
+            if (onFieldChangedEvent != null)
+            {
+                instructions.AddRange(new Instruction[] {
+                    Instruction.Create(OpCodes.Ldarg_0),
+                    Instruction.Create(OpCodes.Ldstr, propDef.Name),
+                    Instruction.Create(OpCodes.Ldarg_1),
+                    Instruction.Create(OpCodes.Callvirt, Patches.BasePatch.GameModule.Import(onFieldChangedEvent))
+                });
+            }
+
+            instructions.AddRange(new Instruction[] {
+                Instruction.Create(OpCodes.Ldarg_0),
+                Instruction.Create(OpCodes.Ldarg_1),
+                Instruction.Create(OpCodes.Stfld, Patches.BasePatch.GameModule.Import(field)),
+                Instruction.Create(OpCodes.Ret)
+            });
+
+            processor = setMethod.Body.GetILProcessor();
+
+            processor.InjectInstructionsToEnd(instructions);
+
+            propDef.SetMethod = setMethod;
+
+            field.DeclaringType.Methods.Add(getMethod);
+            field.DeclaringType.Methods.Add(setMethod);
+
+            field.DeclaringType.Properties.Add(propDef);
         }
     }
 }
