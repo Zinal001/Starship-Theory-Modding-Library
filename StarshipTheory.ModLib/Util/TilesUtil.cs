@@ -81,22 +81,21 @@ namespace StarshipTheory.ModLib.Util
             RemoveTiles(positions.ToArray(), completed);
         }
 
-        public static void RemoveTiles(Vector2[] positions, Action<Exception> completed)
+        public static void RemoveTiles(GameObject ship, Vector2[] positions, Action<Exception> completed)
         {
-            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_RemoveTilesCR(positions, completed));
+            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_RemoveTilesCR(ship, positions, completed));
         }
 
-        private static System.Collections.IEnumerator _RemoveTilesCR(Vector2[] positions, Action<Exception> completed)
+        private static System.Collections.IEnumerator _RemoveTilesCR(GameObject ship, Vector2[] positions, Action<Exception> completed)
         {
-            GameObject tileMap = GameObject.Find("TileMap");
-            Tiles shipTiles = tileMap.GetComponent<Tiles>();
+            Tiles shipTiles = ship.GetComponent<Tiles>();
             ManagerJobs managerJobs = GameObject.Find("Manager").GetComponent<ManagerJobs>();
 
             foreach (Vector2 pos in positions)
             {
                 try
                 {
-                    RemoveTile(pos, tileMap);
+                    RemoveTile(pos, ship);
                 }
                 catch(Exception ex)
                 {
@@ -121,15 +120,14 @@ namespace StarshipTheory.ModLib.Util
                 List<Vector3> partsList = new List<Vector3>();
                 List<Vector2> tilesList = new List<Vector2>();
 
-                foreach (TileData.Vec3 vec in tile.StructureParts)
+                foreach (Vector3 vec in tile.StructureParts)
                 {
-                    Vector2 tilePos = new Vector2(vec.X, vec.Y);
+                    Vector2 tilePos = new Vector2(vec.x, vec.y);
                     if (!tilesList.Contains(tilePos))
                         tilesList.Add(tilePos);
-
-                    Vector3 partData = vec.GetVector();
-                    if (!partsList.Contains(partData))
-                        partsList.Add(partData);
+                    
+                    if (!partsList.Contains(vec))
+                        partsList.Add(vec);
                 }
 
                 if (partsList.Count > 0)
@@ -148,24 +146,23 @@ namespace StarshipTheory.ModLib.Util
             shipTiles.tiles[tile.X, tile.Y].leakValue = 0;
         }
 
-        public static void BuildTiles(IEnumerable<TileData> tiles, Action<Exception> completed)
+        public static void BuildTiles(GameObject ship, IEnumerable<TileData> tiles, Action<Exception> completed)
         {
-            BuildTiles(tiles.ToArray(), completed);
+            BuildTiles(ship, tiles.ToArray(), completed);
         }
 
-        public static void BuildTiles(TileData[] tiles, Action<Exception> completed)
+        public static void BuildTiles(GameObject ship, TileData[] tiles, Action<Exception> completed)
         {
-            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_BuildTilesCR(tiles, completed));
+            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_BuildTilesCR(ship, tiles, completed));
         }
 
-        private static System.Collections.IEnumerator _BuildTilesCR(TileData[] tiles, Action<Exception> completed)
+        private static System.Collections.IEnumerator _BuildTilesCR(GameObject ship, TileData[] tiles, Action<Exception> completed)
         {
-            GameObject tileMap = GameObject.Find("TileMap");
             foreach (TileData td in tiles)
             {
                 try
                 {
-                    BuildTile(td, tileMap);
+                    BuildTile(td, ship);
                 }
                 catch(Exception ex)
                 {
@@ -177,16 +174,15 @@ namespace StarshipTheory.ModLib.Util
             completed?.Invoke(null);
         }
 
-        public static void Import(TileData[] tiles, Action<Exception> completed, bool pauseGame = true)
+        public static void Import(GameObject ship, TileData[] tiles, Action<Exception> completed, bool pauseGame = true)
         {
-            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_ImportCR(tiles, completed, pauseGame));
+            GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_ImportCR(ship, tiles, completed, pauseGame));
         }
 
-        private static System.Collections.IEnumerator _ImportCR(TileData[] tiles, Action<Exception> completed, bool pauseGame)
+        private static System.Collections.IEnumerator _ImportCR(GameObject ship, TileData[] tiles, Action<Exception> completed, bool pauseGame)
         {
-            GameObject tileMap = GameObject.Find("TileMap");
-            Tiles shipTiles = tileMap.GetComponent<Tiles>();
-            Structures shipStructures = tileMap.GetComponent<Structures>();
+            Tiles shipTiles = ship.GetComponent<Tiles>();
+            Structures shipStructures = ship.GetComponent<Structures>();
 
             if(pauseGame)
                 GameObject.Find("Manager").GetComponent<ManagerOptions>().pauseGame("Pause");
@@ -203,7 +199,7 @@ namespace StarshipTheory.ModLib.Util
 
             foreach (TileData td in tiles)
             {
-                List<TileData.Vec3> StructureParts = new List<TileData.Vec3>();
+                List<Vector3> StructureParts = new List<Vector3>();
                 StructureParts.AddRange(td.StructureParts);
                 td.StructureParts = StructureParts;
 
@@ -241,7 +237,7 @@ namespace StarshipTheory.ModLib.Util
                 try
                 {
                     foreach (Vector2 pos in tilesToRemove)
-                        RemoveTile(pos, tileMap);
+                        RemoveTile(pos, ship);
                 }
                 catch(Exception ex)
                 {
@@ -253,7 +249,7 @@ namespace StarshipTheory.ModLib.Util
                 try
                 {
                     foreach (TileData tile in hull)
-                        BuildTile(tile, tileMap);
+                        BuildTile(tile, ship);
                 }
                 catch (Exception ex)
                 {
@@ -265,7 +261,7 @@ namespace StarshipTheory.ModLib.Util
                 try
                 {
                     foreach (TileData tile in floor)
-                        BuildTile(tile, tileMap);
+                        BuildTile(tile, ship);
                 }
                 catch(Exception ex)
                 {
@@ -277,7 +273,7 @@ namespace StarshipTheory.ModLib.Util
                 try
                 {
                     foreach (TileData tile in other)
-                        BuildTile(tile, tileMap);
+                        BuildTile(tile, ship);
                 }
                 catch (Exception ex)
                 {
@@ -297,7 +293,7 @@ namespace StarshipTheory.ModLib.Util
                         crewPos = new Vector2(shipStructures.structure[0].shipCenter.x, shipStructures.structure[0].shipCenter.z);
                     }
 
-                    Crew crew = tileMap.GetComponent<Crew>();
+                    Crew crew = ship.GetComponent<Crew>();
                     foreach (GameObject crewMember in crew.crewList)
                         crewMember.transform.position = new Vector3((int)crewPos.x, crewMember.transform.position.y, (int)crewPos.y);
                 }
@@ -330,29 +326,7 @@ namespace StarshipTheory.ModLib.Util
         public TileRotation Rotation { get; set; }
         public String TileType { get; set; }
 
-        public List<Vec3> StructureParts { get; set; }
-
-        public class Vec3
-        {
-            public float X { get; set; }
-            public float Y { get; set; }
-            public float Z { get; set; }
-
-            public Vec3()
-            {
-
-            }
-
-            public static Vec3 FromVector(Vector3 vec)
-            {
-                return new Vec3() { X = vec.x, Y = vec.y, Z = vec.z };
-            }
-
-            public Vector3 GetVector()
-            {
-                return new Vector3(X, Y, Z);
-            }
-        }
+        public List<Vector3> StructureParts { get; set; }
 
 
         public enum TileRotation : int

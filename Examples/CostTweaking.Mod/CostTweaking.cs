@@ -83,7 +83,7 @@ namespace CostTweaking.Mod
             Group costGroup = btn.Tag as Group;
             String cost_name = costGroup.Tag as String;
 
-            MouseUI mUI = _Manager.GetComponent<MouseUI>()._ModGet_Manager().GetComponent<MouseUI>();
+            MouseUI mUI = _Manager.GetComponent<MouseUI>()._Mod_GetFieldValue<GameObject>("Manager").GetComponent<MouseUI>();
 
             EntityCost cost = Costs.GetEntityCost(cost_name);
             foreach (GUIItem costItem in costGroup.Items)
@@ -125,8 +125,8 @@ namespace CostTweaking.Mod
                 mUI.updateBuildInfomation("ButtonBuild" + cost.Internal_Name);
 
             ManagerResources res = _Manager.GetComponent<ManagerResources>();
-            if (res != null && res._ModGet_TileMap() != null)
-                res.updateResourcePanel(res._ModGet_TileMap());
+            if (res != null)
+                res.updateResourcePanel(GameObject.Find("TileMap"));
 
         }
 

@@ -83,7 +83,7 @@ namespace Scenarios
 
             yield return new WaitForRealSeconds(0.01f);
 
-            TilesUtil.Import(scenario.Ship.Design, new Action<Exception>(ScenarioStarted));
+            TilesUtil.Import(GameObject.Find("TileMap"), scenario.Ship.Design, new Action<Exception>(ScenarioStarted));
         }
 
         private void ScenarioStarted(Exception error)
@@ -119,7 +119,7 @@ namespace Scenarios
                     AI ai = shipCrew.crewList[shipCrew.crewList.Count - 1].GetComponent<AI>();
                     if(shipCrew.crewList.Count == 1)
                         ai.debugLog = true;
-                    ai.manuallySetupCharacterCosmeticsAndSkills(crewMember.Agility - 1, crewMember.Endurance - 1, crewMember.Engineering - 1, crewMember.Intelligence - 1, crewMember.Combat - 1, (int)crewMember.Gender, crewMember.HairColor.GetColor(), crewMember.HeadColor.GetColor(), crewMember.HairType, crewMember.HeadType, crewMember.BodyType, crewMember.Name);
+                    ai.manuallySetupCharacterCosmeticsAndSkills(crewMember.Agility - 1, crewMember.Endurance - 1, crewMember.Engineering - 1, crewMember.Intelligence - 1, crewMember.Combat - 1, (int)crewMember.Gender, crewMember.HairColor, crewMember.HeadColor, crewMember.HairType, crewMember.HeadType, crewMember.BodyType, crewMember.Name);
                 }
 
                 shipStructures.structure[0].cargoMax = _LoadingScenario.Ship.Cargo.CargoSpace;
@@ -130,6 +130,8 @@ namespace Scenarios
                 shipStructures.structure[0].reservesFood = _LoadingScenario.Ship.Cargo.Food;
                 shipStructures.structure[0].credits = _LoadingScenario.Ship.Cargo.Credits;
                 shipStructures.structure[0].cargoCurrent = _LoadingScenario.Ship.Cargo.CurrentCargo;
+
+                _Manager.GetComponent<ManagerResources>().updateResourcePanel(tileMap);
 
                 _Manager.GetComponent<ManagerOptions>().deadCrewEndGame = gameOverOnCrewDeath;
 
@@ -161,8 +163,7 @@ namespace Scenarios
                     try
                     {
                         String json = File.ReadAllText(scenarioFile.FullName);
-
-                        Scenario scenario = Pathfinding.Serialization.JsonFx.JsonReader.Deserialize<Scenario>(json);
+                        Scenario scenario = SerializationUtil.Deserialize<Scenario>(json);
                         if (scenario != null)
                         {
                             try

@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExporterImporter.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TileData.cs" />
     <Compile Include="TileHelper.cs" />

@@ -13,9 +13,9 @@
         "TileType": "HullCorner",
         "StructureParts": [
           {
-            "X": 55,
-            "Y": 68,
-            "Z": 0
+            "x": 55,
+            "y": 68,
+            "z": 0
           }
         ]
       },
@@ -33,9 +33,9 @@
         "TileType": "HullCorner",
         "StructureParts": [
           {
-            "X": 57,
-            "Y": 68,
-            "Z": 1
+            "x": 57,
+            "y": 68,
+            "z": 1
           }
         ]
       },
@@ -60,9 +60,9 @@
         "TileType": "Airlock",
         "StructureParts": [
           {
-            "X": 55,
-            "Y": 65,
-            "Z": 0
+            "x": 55,
+            "y": 65,
+            "z": 0
           }
         ]
       },
@@ -80,9 +80,9 @@
         "TileType": "CargoRack",
         "StructureParts": [
           {
-            "X": 55,
-            "Y": 64,
-            "Z": 0
+            "x": 55,
+            "y": 64,
+            "z": 0
           }
         ]
       },
@@ -100,14 +100,14 @@
         "TileType": "MiniEngine",
         "StructureParts": [
           {
-            "X": 56,
-            "Y": 64,
-            "Z": 2
+            "x": 56,
+            "y": 64,
+            "z": 2
           },
           {
-            "X": 56,
-            "Y": 63,
-            "Z": 2
+            "x": 56,
+            "y": 63,
+            "z": 2
           }
         ]
       },
@@ -139,9 +139,9 @@
         "TileType": "SSolar",
         "StructureParts": [
           {
-            "X": 57,
-            "Y": 65,
-            "Z": 0
+            "x": 57,
+            "y": 65,
+            "z": 0
           }
         ]
       },
@@ -159,9 +159,9 @@
         "TileType": "CPUPanel",
         "StructureParts": [
           {
-            "X": 57,
-            "Y": 64,
-            "Z": 0
+            "x": 57,
+            "y": 64,
+            "z": 0
           }
         ]
       },
@@ -186,9 +186,9 @@
         "TileType": "ShipCore",
         "StructureParts": [
           {
-            "X": 56,
-            "Y": 67,
-            "Z": 0
+            "x": 56,
+            "y": 67,
+            "z": 0
           }
         ]
       },

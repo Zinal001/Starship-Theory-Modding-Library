@@ -15,7 +15,7 @@ namespace StarshipTheory.ModLib.Events
             public SaveLoadEventArgs(int saveSlot)
             {
                 this.saveSlot = saveSlot;
-                this.savePath = UnityEngine.GameObject.Find("Manager").GetComponent<ManagerOptions>()._ModGet_path() + "SaveData" + saveSlot.ToString();
+                this.savePath = UnityEngine.GameObject.Find("Manager").GetComponent<ManagerOptions>()._Mod_GetFieldValue<String>("path") + "SaveData" + saveSlot.ToString();
             }
         }
 

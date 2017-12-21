@@ -127,6 +127,7 @@ namespace Scenarios
 
         public class CrewMember
         {
+            private static readonly Color emptyColor = new Color(0f, 0f, 0f, 0f);
             private static String[] maleNameList = null;
             private static String[] femaleNameList = null;
 
@@ -235,11 +236,11 @@ namespace Scenarios
                 Intelligence = FixPoints(Intelligence);
                 Combat = FixPoints(Combat);
 
-                if (HairColor == null)
-                    HairColor = new Color(GameObject.Find("TileMap").GetComponent<Crew>().returnRandomHairColor());
+                if (HairColor == null || HairColor == emptyColor)
+                    HairColor = GameObject.Find("TileMap").GetComponent<Crew>().returnRandomHairColor();
 
-                if (HeadColor == null)
-                    HeadColor = new Color(GameObject.Find("TileMap").GetComponent<Crew>().returnRandomHeadColor());
+                if (HeadColor == null || HeadColor == emptyColor)
+                    HeadColor = GameObject.Find("TileMap").GetComponent<Crew>().returnRandomHeadColor();
 
                 if (HairType < 1 || HairType > 32)
                     HairType = UnityEngine.Random.Range(1, 32);
@@ -260,37 +261,6 @@ namespace Scenarios
                     skill = UnityEngine.Random.Range(1, 4);
 
                 return skill;
-            }
-        }
-
-        public class Color
-        {
-            public float R { get; set; }
-            public float G { get; set; }
-            public float B { get; set; }
-
-            public Color()
-            {
-
-            }
-
-            public Color(float R, float G, float B)
-            {
-                this.R = R;
-                this.G = G;
-                this.B = B;
-            }
-
-            public Color(UnityEngine.Color C)
-            {
-                this.R = C.r;
-                this.G = C.g;
-                this.B = C.b;
-            }
-
-            public UnityEngine.Color GetColor()
-            {
-                return new UnityEngine.Color(R, G, B);
             }
         }
     }

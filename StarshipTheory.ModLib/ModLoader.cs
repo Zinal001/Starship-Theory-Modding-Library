@@ -27,6 +27,7 @@ namespace StarshipTheory.ModLib
         public ModLoader()
         {
             Instance = this;
+            Util.SerializationUtil.Initialize();
         }
 
         /// <summary>

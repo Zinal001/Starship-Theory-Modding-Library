@@ -60,6 +60,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\Json\UnityColorConverter.cs" />
+    <Compile Include="Converters\Json\UnityVectorConverter.cs" />
     <Compile Include="Events\TileEvents.cs" />
     <Compile Include="GUI\IResizeable.cs" />
     <Compile Include="GUI\ResizeHandle.cs" />
@@ -102,6 +104,7 @@
     </Compile>
     <Compile Include="Resources\Costs.cs" />
     <Compile Include="Resources\EntityCost.cs" />
+    <Compile Include="Util\SerializationUtil.cs" />
     <Compile Include="Util\TilesUtil.cs" />
     <Compile Include="Util\WaitForRealSeconds.cs" />
     <Compile Include="__BugFixes.cs" />
