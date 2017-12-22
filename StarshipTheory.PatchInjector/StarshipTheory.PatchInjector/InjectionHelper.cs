@@ -34,98 +34,98 @@ namespace StarshipTheory.PatchInjector
 
         public static T _Mod_GetGenericStaticFieldValue<T>(String name)
         {
-            System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetType().GetField(name);
+            System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetType().GetField(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)field.GetValue(null);
         }
 
         public T _Mod_GetGenericFieldValue<T>(String name)
         {
-            System.Reflection.FieldInfo field = this.GetType().GetField(name);
+            System.Reflection.FieldInfo field = this.GetType().GetField(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)field.GetValue(field.IsStatic ? null : this);
         }
 
         public static void _Mod_SetStaticFieldValue(String name, Object value)
         {
-            System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetField(name);
+            System.Reflection.FieldInfo field = typeof(HelperPlaceHolder).GetField(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             field.SetValue(null, value);
         }
 
         public void _Mod_SetFieldValue(String name, Object value)
         {
-            System.Reflection.FieldInfo field = this.GetType().GetField(name);
+            System.Reflection.FieldInfo field = this.GetType().GetField(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             field.SetValue(field.IsStatic ? null : this, value);
         }
 
 
         public static T _Mod_GetGenericStaticPropertyValue<T>(String name)
         {
-            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)prop.GetValue(null, null);
         }
 
         public static T _Mod_GetGenericStaticPropertyValue<T>(String name, Object[] index)
         {
-            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)prop.GetValue(null, index);
         }
 
         public T _Mod_GetGenericPropertyValue<T>(string name)
         {
-            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)prop.GetValue(prop.GetGetMethod().IsStatic ? null : this, null);
         }
 
         public T _Mod_GetGenericPropertyValue<T>(string name, Object[] index)
         {
-            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)prop.GetValue(prop.GetGetMethod().IsStatic ? null : this, index);
         }
 
         public static void _Mod_SetStaticPropertyValue(String name, Object value)
         {
-            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             prop.SetValue(null, value, null);
         }
 
         public static void _Mod_SetStaticPropertyValue(String name, Object value, Object[] index)
         {
-            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name);
+            System.Reflection.PropertyInfo prop = typeof(HelperPlaceHolder).GetProperty(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             prop.SetValue(null, value, index);
         }
 
         public void _Mod_SetPropertyValue(String name, Object value)
         {
-            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             prop.SetValue(prop.GetSetMethod().IsStatic ? null : this, value, null);
         }
 
         public void _Mod_SetPropertyValue(String name, Object value, Object[] index)
         {
-            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name);
+            System.Reflection.PropertyInfo prop = this.GetType().GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             prop.SetValue(prop.GetSetMethod().IsStatic ? null : this, value, index);
         }
 
         public static T _Mod_GenericCallStaticMethod<T>(String name, params Object[] parameters)
         {
-            System.Reflection.MethodInfo method = typeof(HelperPlaceHolder).GetMethod(name);
+            System.Reflection.MethodInfo method = typeof(HelperPlaceHolder).GetMethod(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)method.Invoke(null, parameters);
         }
 
         public static Object _Mod_CallStaticMethod(String name, params Object[] parameters)
         {
-            System.Reflection.MethodInfo method = typeof(HelperPlaceHolder).GetMethod(name);
+            System.Reflection.MethodInfo method = typeof(HelperPlaceHolder).GetMethod(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return method.Invoke(null, parameters);
         }
 
         public Object _Mod_CallMethod(String name, params Object[] parameters)
         {
-            System.Reflection.MethodInfo method = this.GetType().GetMethod(name);
+            System.Reflection.MethodInfo method = this.GetType().GetMethod(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return method.Invoke(method.IsStatic ? null : this, parameters);
         }
 
         public T _Mod_GenericCallMethod<T>(String name, params Object[] parameters)
         {
-            System.Reflection.MethodInfo method = this.GetType().GetMethod(name);
+            System.Reflection.MethodInfo method = this.GetType().GetMethod(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             return (T)method.Invoke(method.IsStatic ? null : this, parameters);
         }
 

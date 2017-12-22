@@ -174,6 +174,82 @@ namespace StarshipTheory.ModLib.Util
             completed?.Invoke(null);
         }
 
+        public static String Export(GameObject ship)
+        {
+            List<String> allowedTiles = new List<string>() {
+                    "Hull",
+                    "HullCorner",
+                    "Floor"
+                };
+            
+            Tiles shipTiles = ship.GetComponent<Tiles>();
+            Structures structures = ship.GetComponent<Structures>();
+            if (shipTiles != null && structures != null)
+            {
+                List<Vector2> ignoreTileData = new List<Vector2>();
+                List<TileData> tiles = new List<TileData>();
+
+                foreach (Vector2 pos in structures.structure[0].allTilesList)
+                {
+                    TileInfo info = shipTiles.tiles[(int)pos.x, (int)pos.y];
+
+                    if (ignoreTileData.Contains(pos))
+                    {
+                        if (!allowedTiles.Contains(info.structureType) && !allowedTiles.Contains(info.toBecome))
+                            continue;
+                    }
+
+                    ignoreTileData.Add(pos);
+
+                    List<Vector3> StructureParts = new List<Vector3>();
+                    foreach (Vector3 vec in info.structureParts)
+                        StructureParts.Add(vec);
+
+                    TileData.TileRotation Rotation = TileData.TileRotation.UP;
+
+                    if (info.structureParts.Count > 0)
+                        Rotation = (TileData.TileRotation)(int)info.structureParts[0].z;
+
+                    if (!String.IsNullOrEmpty(info.structureType))
+                    {
+                        List<Vector3> structureParts = new List<Vector3>();
+                        structureParts.AddRange(StructureParts);
+
+                        TileData td2 = new TileData()
+                        {
+                            TileType = info.structureType,
+                            X = (int)pos.x,
+                            Y = (int)pos.y,
+                            Rotation = Rotation,
+                            StructureParts = structureParts
+                        };
+
+                        tiles.Add(td2);
+                        StructureParts.Clear(); //StructureParts mostly likely belongs to the structure, not the tile! --Need confirmation.
+                    }
+
+                    TileData td = new TileData()
+                    {
+                        TileType = info.tileType,
+                        X = (int)pos.x,
+                        Y = (int)pos.y,
+                        Rotation = Rotation,
+                        StructureParts = StructureParts
+                    };
+
+                    tiles.Add(td);
+                }
+
+                if (tiles.Count > 0)
+                {
+                    String json = SerializationUtil.Serialize(tiles.ToArray());
+                    return json;
+                }
+            }
+
+            return null;
+        }
+
         public static void Import(GameObject ship, TileData[] tiles, Action<Exception> completed, bool pauseGame = true)
         {
             GameObject.Find("Manager").GetComponent<ManagerJobs>().StartCoroutine(_ImportCR(ship, tiles, completed, pauseGame));
